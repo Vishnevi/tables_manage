@@ -1,10 +1,21 @@
 {
   "name": "tables_manage",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "private": true
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vishnevi/tables_manage.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Vishnevi/tables_manage/issues"
+  },
+  "homepage": "https://github.com/Vishnevi/tables_manage#readme",
+  "description": ""
 }

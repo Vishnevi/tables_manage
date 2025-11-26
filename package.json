@@ -1,8 +1,10 @@
 {
   "name": "tables_manage",
+  "type": "module",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "start": "nodemon --inspect .\\index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "private": true,
@@ -17,5 +19,10 @@
     "url": "https://github.com/Vishnevi/tables_manage/issues"
   },
   "homepage": "https://github.com/Vishnevi/tables_manage#readme",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "body-parser": "^2.2.1",
+    "express": "^5.1.0",
+    "morgan": "^1.10.1"
+  }
 }

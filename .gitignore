@@ -1,3 +1,5 @@
 /.idea/
 /node_modules/
 /google.json
+/client_secret.json
+/token.json

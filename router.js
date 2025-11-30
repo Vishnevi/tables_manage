@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { createSheetViaDrive } from "./createSheet.js";
+import {createSheet} from "./createSheet.js";
 
 const router = Router();
 
 router.post('/', async (req, res) => {
     try {
-        const url = await createSheetViaDrive();
+        const url = await createSheet();
         res.json({ success: true, url});
     } catch (err) {
         console.error('Error creating sheet:', err);

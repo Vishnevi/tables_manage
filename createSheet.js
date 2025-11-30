@@ -22,7 +22,7 @@ const TEMPLATE = {
     ]
 };
 
-export async function createSheetViaDrive() {
+export async function createSheet() {
     const authClient = await getUserAuth(); // мой gmail
     const drive  = google.drive({version: 'v3', auth: authClient});
     const sheets = google.sheets({version: 'v4', auth: authClient});

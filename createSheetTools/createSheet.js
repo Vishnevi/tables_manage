@@ -1,5 +1,5 @@
 import { google } from "googleapis";
-import { getUserAuth } from "./authUser.js";
+import { getUserAuth } from "../auth/authUser.js";
 
 const TEMPLATE = {
     'Track': [

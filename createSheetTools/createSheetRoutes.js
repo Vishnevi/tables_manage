@@ -9,7 +9,7 @@ router.post('/', async (req, res) => {
         res.json({ success: true, url});
     } catch (err) {
         console.error('Error creating sheet:', err);
-        res.status(500).json({ success: false, error: 'Something went wrong' });
+        res.status(500).json({ success: false, error: 'Error creating sheet' });
     }
 });
 

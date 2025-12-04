@@ -1,5 +1,5 @@
 import { google } from "googleapis";
-import { getUserAuth } from "./authUser.js";
+import { getUserAuth } from "../auth/authUser.js";
 
 const TEMPLATE = {
     'Track': [
@@ -61,6 +61,44 @@ export async function createSheet() {
                 range: `'${title}'!A1`,
                 values: TEMPLATE[title]
             }))
+        }
+    });
+
+    const meta = await sheets.spreadsheets.get({ spreadsheetId });
+
+    await sheets.spreadsheets.batchUpdate({
+        spreadsheetId,
+        requestBody: {
+            requests: (meta.data.sheets || [])
+                .filter(el => sheetTitles.includes(el.properties.title)) // только нужные листы
+                .flatMap(el => {
+                    return [
+                        {
+                        updateDimensionProperties: {
+                            range: {
+                                sheetId: el.properties.sheetId,
+                                dimension: 'ROWS',
+                                startIndex: 0,  // строка 1
+                                endIndex: 2  // строка 2
+                            },
+                            properties: { pixelSize: 100 }, // высота
+                            fields: 'pixelSize'
+                        }
+                        },
+                        {
+                        updateDimensionProperties: {
+                            range: {
+                                sheetId: el.properties.sheetId,
+                                dimension: 'COLUMNS',
+                                startIndex: 0,  // колонка A
+                                endIndex: TEMPLATE[el.properties.title][0].length  // до последней колонки шаблона
+                            },
+                            properties: { pixelSize: 300 }, // ширина
+                            fields: 'pixelSize'
+                        }
+                        }
+                    ];
+                })
         }
     });
 

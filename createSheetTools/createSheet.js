@@ -64,6 +64,44 @@ export async function createSheet() {
         }
     });
 
+    const meta = await sheets.spreadsheets.get({ spreadsheetId });
+
+    await sheets.spreadsheets.batchUpdate({
+        spreadsheetId,
+        requestBody: {
+            requests: (meta.data.sheets || [])
+                .filter(el => sheetTitles.includes(el.properties.title)) // только нужные листы
+                .flatMap(el => {
+                    return [
+                        {
+                        updateDimensionProperties: {
+                            range: {
+                                sheetId: el.properties.sheetId,
+                                dimension: 'ROWS',
+                                startIndex: 0,  // строка 1
+                                endIndex: 2  // строка 2
+                            },
+                            properties: { pixelSize: 100 }, // высота
+                            fields: 'pixelSize'
+                        }
+                        },
+                        {
+                        updateDimensionProperties: {
+                            range: {
+                                sheetId: el.properties.sheetId,
+                                dimension: 'COLUMNS',
+                                startIndex: 0,  // колонка A
+                                endIndex: TEMPLATE[el.properties.title][0].length  // до последней колонки шаблона
+                            },
+                            properties: { pixelSize: 300 }, // ширина
+                            fields: 'pixelSize'
+                        }
+                        }
+                    ];
+                })
+        }
+    });
+
     await drive.permissions.create({
         fileId: spreadsheetId,
         requestBody: { type: 'anyone', role: 'writer' }

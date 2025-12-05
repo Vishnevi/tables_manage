@@ -7,9 +7,18 @@ router.post('/', async (req, res) => {
     try {
         const inputSheetId = req.body.sheetIdInput;
         const sheetIdTrack = req.body.sheetIdTrack;
+        const result = await mergeToTrack(inputSheetId, sheetIdTrack);
 
-        await mergeToTrack(inputSheetId, sheetIdTrack);
-        res.json({ success: true });
+        if (!result.ok) {
+            res.status(400).json({
+                success: false,
+                errors: result.errors || [],
+                error: result.error,
+                message: result.message
+            });
+        }
+
+        res.status(200).json({ success: true });
     } catch (err) {
         console.error('Error sync to Track', err);
         res.status(400).json({ success: false, error: 'Something went wrong' });

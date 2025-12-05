@@ -59,6 +59,25 @@ syncToTrack.addEventListener("click", async () => {
 
         const result = await response.json();
 
+        if (!response.ok) {
+            if (result.errors && Array.isArray(result.errors) && result.errors.length) {
+                statusP.innerHTML =
+                    '❌ ISRC errors:<br>' +
+                    result.errors.map(err => {
+                        if (err.type === 'missing-isrc') {
+                            return `Row ${err.row}: "${err.title}" — missing ISRC`;
+                        }
+                        if (err.type === 'duplicate-isrc') {
+                            return `Row ${err.row}: "${err.title}" — duplicate ISRC ${err.isrc} (row ${err.firstRow} at "${err.firstTitle}")`;
+                        }
+                        return `Row ${err.row || '?'}: ${err.message || 'Error'}`;
+                    }).join('<br>');
+            } else {
+                statusP.innerText = '❌ Sync to track failed!';
+            }
+            return;
+        }
+
         if (result.success) statusP.innerText = '✅ Sync to track successfully!';
         else statusP.innerText = '❌ Sync to track failed!';
 

@@ -14,6 +14,9 @@ export async function mergeToTrack(inputSheetId, sheetIdTrack) { // ПРИНЯЛ
         const rows = firstData.data.values;
 
         const titleColumns = [9, 13, 17, 21, 25, 29, 33, 37, 41, 45, 49, 53, 57, 61, 65, 69, 73, 77, 81, 85];
+        const ISRCColumnLetters = ['K','O','S','W','AA','AE','AI','AM','AQ','AU','AY','BC','BG','BK','BO','BS','BW','CA','CE','CI'];
+        const digits = '1234567890';
+        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
         const artistsOutput = [];
         const titlesOutput = [];
@@ -30,42 +33,82 @@ export async function mergeToTrack(inputSheetId, sheetIdTrack) { // ПРИНЯЛ
                .filter(el => el && el.trim() !== '')
                .join(', ');
 
-           titleColumns.forEach(i => {
+           titleColumns.forEach((i, colIndex) => {
                const title = row[i];
                const ISRC = row[i + 1]; // ISRC находится на следующем индексе от title
 
-               if (title && title.trim() !== '') {
-                   const trimmedTitle = title.trim();
-                   const trimmedISRC = ISRC ? ISRC.trim() : '';
+               const trimmedTitle = title ? title.trim() : '';
+               const trimmedISRC = ISRC ? ISRC.trim() : '';
 
-                   const rowNumber = rowIndex + 3;
+               const rowNumber = rowIndex + 3;
+               const ISRCColLetter = ISRCColumnLetters[colIndex];
 
+               if (!trimmedTitle && trimmedISRC) {
+                   errors.push({
+                       type: 'missing-title',
+                       message: '❌ Missing title',
+                       row: rowNumber,
+                       column: ISRCColLetter,
+                       title: trimmedTitle,
+                       isrc: trimmedISRC
+                   });
+                   return;
+               }
+               if (!trimmedTitle && !trimmedISRC) {
+                   return;
+               }
+
+
+               if (trimmedTitle) {
                    if (!trimmedISRC) {
                        errors.push({
                            type: 'missing-isrc',
                            message: '❌ Missing ISRC code',
                            row: rowNumber,
-                           title: trimmedTitle
+                           column: ISRCColLetter,
+                           title: trimmedTitle,
                        });
                    } else {
                        const key = trimmedISRC.toUpperCase();
 
-                       if (!ISRCMap[key]) {
-                           ISRCMap[key] = {
-                               firstRow: rowNumber,
-                               firstTitle: trimmedTitle
-                           };
-                       } else {
-                           const first = ISRCMap[key];
+                       let hasDigit = false;
+                       let hasLetter = false;
+
+                       for (let i = 0; i < key.length; i++) {
+                           if (digits.includes(key[i])) hasDigit = true;
+                           if (letters.includes(key[i])) hasLetter = true;
+                           if (hasDigit && hasLetter) break;
+                       }
+
+                       if (!hasDigit || !hasLetter) {
                            errors.push({
-                               type: 'duplicate-isrc',
-                               message: '❌ Duplicate ISRC code',
+                               type: 'incorrect-isrc',
+                               message: '❌ Incorrect ISRC code',
                                isrc: trimmedISRC,
                                row: rowNumber,
-                               title: trimmedTitle,
-                               firstRow: first.firstRow,
-                               firstTitle: first.firstTitle
-                           });
+                               column: ISRCColLetter,
+                               title: trimmedTitle
+                           })
+                       } else {
+
+                           if (!ISRCMap[key]) {
+                               ISRCMap[key] = {
+                                   firstRow: rowNumber,
+                                   firstTitle: trimmedTitle
+                               };
+                           } else {
+                               const first = ISRCMap[key];
+                               errors.push({
+                                   type: 'duplicate-isrc',
+                                   message: '❌ Duplicate ISRC code',
+                                   isrc: trimmedISRC,
+                                   row: rowNumber,
+                                   column: ISRCColLetter,
+                                   title: trimmedTitle,
+                                   firstRow: first.firstRow,
+                                   firstTitle: first.firstTitle
+                               });
+                           }
                        }
                    }
 

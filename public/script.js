@@ -64,11 +64,17 @@ syncToTrack.addEventListener("click", async () => {
                 statusP.innerHTML =
                     '❌ ISRC errors:<br>' +
                     result.errors.map(err => {
+                        if (err.type === 'missing-title') {
+                            return `Row ${err.row}, Column "${err.column}" — ${err.message} "${err.isrc}"`;
+                        }
                         if (err.type === 'missing-isrc') {
-                            return `Row ${err.row}: "${err.title}" — missing ISRC`;
+                            return `Row ${err.row}, Column "${err.column}" — ${err.message}`;
                         }
                         if (err.type === 'duplicate-isrc') {
-                            return `Row ${err.row}: "${err.title}" — duplicate ISRC ${err.isrc} (row ${err.firstRow} at "${err.firstTitle}")`;
+                            return `Row ${err.row}, Column "${err.column}" — ${err.message} "${err.isrc}"`;
+                        }
+                        if (err.type === 'incorrect-isrc') {
+                            return `Row ${err.row}, Column "${err.column}" — ${err.message} "${err.isrc}"`;
                         }
                         return `Row ${err.row || '?'}: ${err.message || 'Error'}`;
                     }).join('<br>');

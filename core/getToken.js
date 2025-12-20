@@ -7,7 +7,7 @@ const SCOPES = [
 ];
 
 async function main() {
-    const creds = JSON.parse(await fs.readFile('./client_secret.json', 'utf8'));
+    const creds = JSON.parse(await fs.readFile('./secrets/client_secret.json', 'utf8'));
     const { client_id, client_secret, redirect_uris } = creds.installed;
     const oAuth2 = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
 

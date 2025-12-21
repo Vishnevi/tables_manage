@@ -80,7 +80,7 @@ export async function mergeToTrack(inputSheetId, sheetIdTrack) { // ПРИНЯЛ
                            if (hasDigit && hasLetter) break;
                        }
 
-                       if (!hasDigit || !hasLetter) {
+                       if (!hasDigit || !hasLetter || trimmedISRC.length !== 12) {
                            errors.push({
                                type: 'incorrect-isrc',
                                message: '❌ Incorrect ISRC code',

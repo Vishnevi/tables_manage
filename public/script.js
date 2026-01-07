@@ -4,6 +4,7 @@ const statusP = document.querySelector("#status");
 const syncToTrack = document.querySelector("#syncToTrack");
 
 let newSheetTrackId = '';
+let newSheetWorksId = '';
 
 createBtn.addEventListener("click", async () => {
     const sheetIdValue = sheetIdInput.value.trim();
@@ -24,9 +25,12 @@ createBtn.addEventListener("click", async () => {
 
         const result = await response.json();
 
-        if (result.success && result.url) {
-            statusP.innerHTML = `✅ Sheet created: <a href="${result.url}" target="_blank">Open it here</a>`;
-            newSheetTrackId = result.url.match(/spreadsheets\/d\/([a-zA-Z0-9-_]+)/)[1];
+        if (result.success && result.urlTrack && result.urlWorks) {
+            statusP.innerHTML = `
+                ✅ Track Sheet created: <a href="${result.urlTrack}" target="_blank">Open it here</a><br>
+                ✅ Works Sheet created: <a href="${result.urlWorks}" target="_blank">Open it here</a>`;
+            newSheetTrackId = result.urlTrack.match(/spreadsheets\/d\/([a-zA-Z0-9-_]+)/)[1];
+            newSheetWorksId = result.urlWorks.match(/spreadsheets\/d\/([a-zA-Z0-9-_]+)/)[1];
         } else {
             statusP.innerText = '❌ Error creating sheet.';
         }

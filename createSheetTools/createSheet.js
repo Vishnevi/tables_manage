@@ -1,7 +1,7 @@
 import { google } from "googleapis";
 import { getUserAuth } from "../auth/authUser.js";
 
-const TEMPLATE = {
+const TEMPLATE_TR = {
     'Track': [
         ['ID', 'Title', 'Version', 'Artist', 'Foreign ID', 'Project ID', 'ISRC', 'Label', 'P Line', 'Duration', 'Mechanical Rate Basis', 'Custom US Statutory Mechanical Rate', 'Custom Canadian Statutory Mechanical Rate', 'Report Mechanicals', 'Catalogue Groups', 'Default Release Distribution Channel', 'Default Release Cat No', 'Aliases'],
         ['Leave blank if a new Track', '', '', '', '', '', '', '', '', 'Number of seconds', 'Sale Date or Custom', '', '', 'TRUE or FALSE', 'Separate multiple groups using a semi-colon (;)', 'Must match your Distribution Channels setup in Settings', '', 'Separate multiple aliases using a semi-colon (;)']
@@ -22,7 +22,9 @@ const TEMPLATE = {
     ]
 };
 
-export async function createSheet() {
+const TEMPLATE_WR = {}; // сделать шаблон для Works
+
+export async function createTrackSheet() {
     const authClient = await getUserAuth(); // мой gmail
     const drive  = google.drive({version: 'v3', auth: authClient});
     const sheets = google.sheets({version: 'v4', auth: authClient});
@@ -36,7 +38,7 @@ export async function createSheet() {
     });
     const spreadsheetId = createResp.data.id;
 
-    const sheetTitles = Object.keys(TEMPLATE);
+    const sheetTitles = Object.keys(TEMPLATE_TR);
     const requests = [];
 
     requests.push({ updateSheetProperties: {
@@ -59,7 +61,7 @@ export async function createSheet() {
             valueInputOption: 'RAW',
             data: sheetTitles.map(title => ({
                 range: `'${title}'!A1`,
-                values: TEMPLATE[title]
+                values: TEMPLATE_TR[title]
             }))
         }
     });
@@ -91,7 +93,7 @@ export async function createSheet() {
                                 sheetId: el.properties.sheetId,
                                 dimension: 'COLUMNS',
                                 startIndex: 0,  // колонка A
-                                endIndex: TEMPLATE[el.properties.title][0].length  // до последней колонки шаблона
+                                endIndex: TEMPLATE_TR[el.properties.title][0].length  // до последней колонки шаблона
                             },
                             properties: { pixelSize: 300 }, // ширина
                             fields: 'pixelSize'
@@ -108,4 +110,14 @@ export async function createSheet() {
     });
 
     return `https://docs.google.com/spreadsheets/d/${spreadsheetId}`;
+}
+
+export async function createWorksSheet() {
+    const authClient = await getUserAuth(); // мой gmail
+    const drive  = google.drive({version: 'v3', auth: authClient});
+    const sheets = google.sheets({version: 'v4', auth: authClient});
+
+    // написать код для создания таблицы Works
+
+    return `https://docs.google.com/spreadsheets/d/kek`;
 }

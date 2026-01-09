@@ -304,7 +304,7 @@ export async function createTrackSheet() {
         spreadsheetId,
         requestBody: {
             requests: (meta.data.sheets || [])
-                .filter(el => sheetTitles.includes(el.properties.title)) // только нужные листы
+                .filter(el => sheetTitles.includes(el.properties.title) && el.properties.title !== 'Reference')
                 .flatMap(el => {
                     return [
                         {
@@ -312,8 +312,8 @@ export async function createTrackSheet() {
                             range: {
                                 sheetId: el.properties.sheetId,
                                 dimension: 'ROWS',
-                                startIndex: 0,  // строка 1
-                                endIndex: 2  // строка 2
+                                startIndex: 0, // строка 1
+                                endIndex: 2 // строка 2
                             },
                             properties: { pixelSize: 100 }, // высота
                             fields: 'pixelSize'
@@ -324,8 +324,8 @@ export async function createTrackSheet() {
                             range: {
                                 sheetId: el.properties.sheetId,
                                 dimension: 'COLUMNS',
-                                startIndex: 0,  // колонка A
-                                endIndex: TEMPLATE_TR[el.properties.title][0].length  // до последней колонки шаблона
+                                startIndex: 0, // колонка A
+                                endIndex: TEMPLATE_TR[el.properties.title][0].length // до последней колонки шаблона
                             },
                             properties: { pixelSize: 300 }, // ширина
                             fields: 'pixelSize'
@@ -333,6 +333,33 @@ export async function createTrackSheet() {
                         }
                     ];
                 })
+        }
+    });
+
+    await sheets.spreadsheets.batchUpdate({
+        spreadsheetId,
+        requestBody: {
+            requests: (meta.data.sheets || [])
+                .filter(el => sheetTitles.includes(el.properties.title) && el.properties.title !== 'Reference')
+                .map(el => ({
+                    repeatCell: {
+                        range: {
+                            sheetId: el.properties.sheetId,
+                            startRowIndex: 0,
+                            endRowIndex: TEMPLATE_TR[el.properties.title].length,
+                            startColumnIndex: 0,
+                            endColumnIndex: TEMPLATE_TR[el.properties.title][0].length
+                        },
+                        cell: {
+                            userEnteredFormat: {
+                                horizontalAlignment: 'CENTER',
+                                verticalAlignment: 'MIDDLE',
+                                wrapStrategy: 'WRAP'
+                            }
+                        },
+                        fields: 'userEnteredFormat(horizontalAlignment,verticalAlignment,wrapStrategy)'
+                    }
+                }))
         }
     });
 
@@ -344,12 +371,134 @@ export async function createTrackSheet() {
     return `https://docs.google.com/spreadsheets/d/${spreadsheetId}`;
 }
 
+
+
+
+
 export async function createWorksSheet() {
     const authClient = await getUserAuth(); // мой gmail
     const drive  = google.drive({version: 'v3', auth: authClient});
     const sheets = google.sheets({version: 'v4', auth: authClient});
 
-    // написать код для создания таблицы Works
+    //создаем таблицу (пустую)
+    const createResp = await drive.files.create({
+        requestBody: {
+            name: 'WR TEST',
+            mimeType: 'application/vnd.google-apps.spreadsheet',
+        },
+        fields: 'id'
+    });
 
-    return `https://docs.google.com/spreadsheets/d/kek`;
+    const spreadsheetId = createResp.data.id;
+
+    //делаем массив из названий листов
+    const sheetTitles = Object.keys(TEMPLATE_WR);
+    const requests = [];
+
+    //переименовываем первый лист потому что он у нас автоматически создается как Sheet1
+    requests.push({ updateSheetProperties: {
+            properties: { sheetId: 0, title: sheetTitles[0] },
+            fields: 'title'
+        }});
+
+    //создаем остальные листы не считая первый Works
+    for (let i = 1; i < sheetTitles.length; i++) {
+        requests.push({ addSheet: { properties: { title: sheetTitles[i] } } });
+    }
+
+    //отправляем запросы на переименование и создание новых листов
+    await sheets.spreadsheets.batchUpdate({
+        spreadsheetId,
+        requestBody: { requests }
+    });
+
+    //заполняем созданные листы по шаблону
+    await sheets.spreadsheets.values.batchUpdate({
+        spreadsheetId,
+        requestBody: {
+            valueInputOption: 'RAW', // разобраться че еще есть кроме RAW
+            data: sheetTitles.map(title => ({
+                range: `'${title}'!A1`,
+                values: TEMPLATE_WR[title]
+            }))
+        }
+    });
+
+    //получаем инфу о таблице, чтобы подогнать размеры для колонок
+    const meta = await sheets.spreadsheets.get({ spreadsheetId });
+
+
+    //задаем высоту строк и ширину столбцов для всех листов кроме листа Reference
+    await sheets.spreadsheets.batchUpdate({
+        spreadsheetId,
+        requestBody: {
+            requests: (meta.data.sheets || [])
+                .filter(el => sheetTitles.includes(el.properties.title) && el.properties.title !== 'Reference')
+                .flatMap(el => {
+                    return [
+                        {
+                            updateDimensionProperties: {
+                                range: {
+                                    sheetId: el.properties.sheetId,
+                                    dimension: 'ROWS',
+                                    startIndex: 0,
+                                    endIndex: 2
+                                },
+                                properties: { pixelSize: 100 },
+                                fields: 'pixelSize'
+                            }
+                        },
+                        {
+                            updateDimensionProperties: {
+                                range: {
+                                    sheetId: el.properties.sheetId,
+                                    dimension: 'COLUMNS',
+                                    startIndex: 0,
+                                    endIndex: TEMPLATE_WR[el.properties.title][0].length
+                                },
+                                properties: { pixelSize: 300 },
+                                fields: 'pixelSize'
+                            }
+                        }
+                    ];
+                })
+        }
+    });
+
+    //выравниваем текст в ячейках по центру и не даем ему уползать
+    await sheets.spreadsheets.batchUpdate({
+        spreadsheetId,
+        requestBody: {
+            requests: (meta.data.sheets || [])
+                .filter(el => sheetTitles.includes(el.properties.title) && el.properties.title !== 'Reference')
+                .map(el => ({
+                    repeatCell: {
+                        range: {
+                            sheetId: el.properties.sheetId,
+                            startRowIndex: 0,
+                            endRowIndex: TEMPLATE_WR[el.properties.title].length,
+                            startColumnIndex: 0,
+                            endColumnIndex: TEMPLATE_WR[el.properties.title][0].length
+                        },
+                        cell: {
+                            userEnteredFormat: {
+                                horizontalAlignment: 'CENTER',
+                                verticalAlignment: 'MIDDLE',
+                                wrapStrategy: 'WRAP'
+                            }
+                        },
+                        fields: 'userEnteredFormat(horizontalAlignment,verticalAlignment,wrapStrategy)'
+                    }
+                }))
+        }
+    });
+
+    //делаем таблицу общедоступной для редактирования
+    await drive.permissions.create({
+        fileId: spreadsheetId,
+        requestBody: { type: 'anyone', role: 'writer' }
+    });
+
+
+    return `https://docs.google.com/spreadsheets/d/${spreadsheetId}`;
 }

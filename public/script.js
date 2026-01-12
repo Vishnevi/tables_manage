@@ -1,7 +1,7 @@
 const sheetIdInput = document.querySelector("#sheetId");
 const createBtn = document.querySelector("#createBtn");
 const statusP = document.querySelector("#status");
-const syncToTrack = document.querySelector("#syncToTrack");
+const syncBtn = document.querySelector("#syncBtn");
 
 let newSheetTrackId = '';
 let newSheetWorksId = '';
@@ -41,57 +41,107 @@ createBtn.addEventListener("click", async () => {
 });
 
 
-syncToTrack.addEventListener("click", async () => {
+syncBtn.addEventListener("click", async () => {
     const sheetIdValue = sheetIdInput.value.trim();
 
-    if (!sheetIdValue) statusP.innerText = 'Please enter a sheet id!';
-    if (!newSheetTrackId) statusP.innerText = 'No created sheet! Create a sheet first!';
+    if (!sheetIdValue) {
+        statusP.innerText = 'Please enter a sheet id!';
+        return;
+    }
+    if (!newSheetTrackId || !newSheetWorksId) {
+        statusP.innerText = 'No created sheets! Create sheets first!';
+        return;
+    }
 
-    statusP.innerText = 'Syncing to track...';
+    statusP.innerText = 'Syncing...';
 
     try {
-        const response = await fetch('/sync-track', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                sheetIdInput: sheetIdValue,
-                sheetIdTrack: newSheetTrackId
+        const [trackResponse, worksResponse] = await Promise.all([
+            fetch('/sync-track', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    sheetIdInput: sheetIdValue,
+                    sheetIdTrack: newSheetTrackId
+                })
+            }),
+            fetch('/sync-works', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    sheetIdInput: sheetIdValue,
+                    sheetIdWorks: newSheetWorksId
+                })
             })
-        })
+        ]);
 
-        const result = await response.json();
+        const trackResult = await trackResponse.json();
+        const worksResult = await worksResponse.json();
 
-        if (!response.ok) {
-            if (result.errors && Array.isArray(result.errors) && result.errors.length) {
-                statusP.innerHTML =
-                    '❌ ISRC errors:<br>' +
-                    result.errors.map(err => {
-                        if (err.type === 'missing-title') {
-                            return `Row ${err.row}, Column "${err.column}" — ${err.message} "${err.isrc}"`;
-                        }
-                        if (err.type === 'missing-isrc') {
-                            return `Row ${err.row}, Column "${err.column}" — ${err.message}`;
-                        }
-                        if (err.type === 'duplicate-isrc') {
-                            return `Row ${err.row}, Column "${err.column}" — ${err.message} "${err.isrc}"`;
-                        }
-                        if (err.type === 'incorrect-isrc') {
-                            return `Row ${err.row}, Column "${err.column}" — ${err.message} "${err.isrc}"`;
-                        }
-                        return `Row ${err.row || '?'}: ${err.message || 'Error'}`;
-                    }).join('<br>');
+        let errorMessages = [];
+
+        if (!trackResponse.ok) {
+            if (trackResult.errors && Array.isArray(trackResult.errors) && trackResult.errors.length) {
+                const trackErrors = trackResult.errors.map(err => {
+                    if (err.type === 'missing-title') {
+                        return `Row ${err.row}, Column "${err.column}" — ${err.message} "${err.isrc}"`;
+                    }
+                    if (err.type === 'missing-isrc') {
+                        return `Row ${err.row}, Column "${err.column}" — ${err.message}`;
+                    }
+                    if (err.type === 'duplicate-isrc') {
+                        return `Row ${err.row}, Column "${err.column}" — ${err.message} "${err.isrc}"`;
+                    }
+                    if (err.type === 'incorrect-isrc') {
+                        return `Row ${err.row}, Column "${err.column}" — ${err.message} "${err.isrc}"`;
+                    }
+                    return `Row ${err.row || '?'}: ${err.message || 'Error'}`;
+                }).join('<br>');
+                errorMessages.push('❌ <b>Track ISRC errors:</b><br>' + trackErrors);
             } else {
-                statusP.innerText = '❌ Sync to track failed!';
+                errorMessages.push('❌ Sync to track failed!');
             }
+        }
+
+        if (!worksResponse.ok) {
+            if (worksResult.errors && Array.isArray(worksResult.errors) && worksResult.errors.length) {
+                const worksErrors = worksResult.errors.map(err => {
+                    if (err.type === 'missing-title') {
+                        return `Row ${err.row}, Column "${err.column}" — ${err.message} "${err.isrc}"`;
+                    }
+                    if (err.type === 'missing-isrc') {
+                        return `Row ${err.row}, Column "${err.column}" — ${err.message}`;
+                    }
+                    if (err.type === 'duplicate-isrc') {
+                        return `Row ${err.row}, Column "${err.column}" — ${err.message} "${err.isrc}"`;
+                    }
+                    if (err.type === 'incorrect-isrc') {
+                        return `Row ${err.row}, Column "${err.column}" — ${err.message} "${err.isrc}"`;
+                    }
+                    return `Row ${err.row || '?'}: ${err.message || 'Error'}`;
+                }).join('<br>');
+                errorMessages.push('❌ <b>Works ISRC errors:</b><br>' + worksErrors);
+            } else {
+                errorMessages.push('❌ Sync to works failed!');
+            }
+        }
+
+        if (errorMessages.length > 0) {
+            statusP.innerHTML = errorMessages.join('<br><br>');
             return;
         }
 
-        if (result.success) statusP.innerText = '✅ Sync to track successfully!';
-        else statusP.innerText = '❌ Sync to track failed!';
+        if (trackResult.success && worksResult.success) {
+            statusP.innerText = '✅ Sync successfully!';
+        } else {
+            statusP.innerText = '❌ Sync failed!';
+        }
 
     } catch (err) {
         statusP.innerText = '❌ ' + err.message;
     }
-})
+});

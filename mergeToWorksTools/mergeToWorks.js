@@ -6,6 +6,175 @@ export async function mergeToWorks(inputSheetId, sheetIdWorks) {
     const sheets = google.sheets({version: 'v4', auth: authClient});
 
     try {
+        //чтение данных из первой таблицы
+        const firstData = await sheets.spreadsheets.values.get({
+            spreadsheetId: inputSheetId,
+            range: 'Sheet1!A3:GG'
+        });
+
+        const rows = firstData.data.values;
+
+        //обработка данных (трансформация тип)
+        const titleColumns = [9, 13, 17, 21, 25, 29, 33, 37, 41, 45, 49, 53, 57, 61, 65, 69, 73, 77, 81, 85];
+        const ISRCColumnLetters = ['K','O','S','W','AA','AE','AI','AM','AQ','AU','AY','BC','BG','BK','BO','BS','BW','CA','CE','CI'];
+        const digits = '1234567890';
+        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+        const songTitleOutput = []; //Лист Works - Title (B)
+        const performersOutput = []; //Лист Works Performers (U)
+        const ISRCOutput = []; //Лист Works - Track ISRCs (V)
+        const territoriesOutput = []; //Лист Works - Territories (W)
+
+        const errors = [];
+        const ISRCMap = {};
+
+        rows.forEach((row, rowIndex) => {
+            //Title
+            const songTitle = row[0];
+            const trimmedSongTitle = songTitle ? songTitle.trim() : '';
+            songTitleOutput.push([trimmedSongTitle]);
+
+            //Territories
+            territoriesOutput.push([trimmedSongTitle ? 'WW' : '']);
+
+            //Performers
+            const performers = [4, 5, 6, 7, 8]
+                .map(i => row[i])
+                .filter(el => el && el.trim() !== '')
+                .join(';');
+            performersOutput.push([performers]);
+
+            //ISRC
+            const rowISRC = [];
+            titleColumns.forEach((i, colIndex) => {
+                const title = row[i];
+                const ISRC = row[i + 1];
+
+                const trimmedTitle = title ? title.trim() : '';
+                const trimmedISRC = ISRC ? ISRC.trim() : '';
+
+                const rowNumber = rowIndex + 3;
+                const ISRCColLetter = ISRCColumnLetters[colIndex];
+
+                if (!trimmedTitle && trimmedISRC) {
+                    errors.push({
+                        type: 'missing-title',
+                        message: '❌ Missing title',
+                        row: rowNumber,
+                        column: ISRCColLetter,
+                        title: trimmedTitle,
+                        isrc: trimmedISRC
+                    });
+                    return;
+                }
+                if (!trimmedTitle && !trimmedISRC) {
+                    return;
+                }
+
+                if (trimmedTitle) {
+                    if (!trimmedISRC) {
+                        errors.push({
+                            type: 'missing-isrc',
+                            message: '❌ Missing ISRC code',
+                            row: rowNumber,
+                            column: ISRCColLetter,
+                            title: trimmedTitle,
+                        });
+                    } else {
+                        const key = trimmedISRC.toUpperCase();
+
+                        let hasDigit = false;
+                        let hasLetter = false;
+
+                        for (let i = 0; i < key.length; i++) {
+                            if (digits.includes(key[i])) hasDigit = true;
+                            if (letters.includes(key[i])) hasLetter = true;
+                            if (hasDigit && hasLetter) break;
+                        }
+
+                        if (!hasDigit || !hasLetter || trimmedISRC.length !== 12) {
+                            errors.push({
+                                type: 'incorrect-isrc',
+                                message: '❌ Incorrect ISRC code',
+                                isrc: trimmedISRC,
+                                row: rowNumber,
+                                column: ISRCColLetter,
+                                title: trimmedTitle
+                            })
+                        } else {
+                            if (!ISRCMap[key]) {
+                                ISRCMap[key] = {
+                                    firstRow: rowNumber,
+                                    firstTitle: trimmedTitle
+                                };
+                            } else {
+                                const first = ISRCMap[key];
+                                errors.push({
+                                    type: 'duplicate-isrc',
+                                    message: '❌ Duplicate ISRC code',
+                                    isrc: trimmedISRC,
+                                    row: rowNumber,
+                                    column: ISRCColLetter,
+                                    title: trimmedTitle,
+                                    firstRow: first.firstRow,
+                                    firstTitle: first.firstTitle
+                                });
+                            }
+                        }
+                    }
+
+                    rowISRC.push(trimmedISRC);
+                }
+            });
+            const joinedISRC = rowISRC.join(';');
+            ISRCOutput.push([joinedISRC]);
+
+        });
+
+        //ошибки
+        if (errors.length > 0) {
+            console.error('ISRC validation errors:', errors);
+            return {ok: false, errors};
+        }
+
+
+        //отправляю запросы на аптейт данных (финал)
+        await sheets.spreadsheets.values.update({ //Лист Works - Title (B)
+            spreadsheetId: sheetIdWorks,
+            range: 'Works!B3',
+            valueInputOption: 'RAW',
+            requestBody: {
+                values: songTitleOutput
+            }
+        });
+
+        await sheets.spreadsheets.values.update({ //Лист Works - Territories (W)
+            spreadsheetId: sheetIdWorks,
+            range: 'Works!W3',
+            valueInputOption: 'RAW',
+            requestBody: {
+                values: territoriesOutput
+            }
+        });
+
+        await sheets.spreadsheets.values.update({ //Лист Works Performers (U)
+            spreadsheetId: sheetIdWorks,
+            range: 'Works!U3',
+            valueInputOption: 'RAW',
+            requestBody: {
+                values: performersOutput
+            }
+        });
+
+        await sheets.spreadsheets.values.update({ //Лист Works - Track ISRCs (V)
+            spreadsheetId: sheetIdWorks,
+            range: 'Works!V3',
+            valueInputOption: 'RAW',
+            requestBody: {
+                values: ISRCOutput
+            }
+        });
+
 
         return {ok: true};
 

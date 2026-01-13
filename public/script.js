@@ -88,16 +88,16 @@ syncBtn.addEventListener("click", async () => {
             if (trackResult.errors && Array.isArray(trackResult.errors) && trackResult.errors.length) {
                 const trackErrors = trackResult.errors.map(err => {
                     if (err.type === 'missing-title') {
-                        return `Row ${err.row}, Column "${err.column}" — ${err.message} "${err.isrc}"`;
+                        return `Row ${err.row}, Column "${err.column}" - ${err.message} "${err.isrc}"`;
                     }
                     if (err.type === 'missing-isrc') {
-                        return `Row ${err.row}, Column "${err.column}" — ${err.message}`;
+                        return `Row ${err.row}, Column "${err.column}" - ${err.message}`;
                     }
                     if (err.type === 'duplicate-isrc') {
-                        return `Row ${err.row}, Column "${err.column}" — ${err.message} "${err.isrc}"`;
+                        return `Row ${err.row}, Column "${err.column}" - ${err.message} "${err.isrc}"`;
                     }
                     if (err.type === 'incorrect-isrc') {
-                        return `Row ${err.row}, Column "${err.column}" — ${err.message} "${err.isrc}"`;
+                        return `Row ${err.row}, Column "${err.column}" - ${err.message} "${err.isrc}"`;
                     }
                     return `Row ${err.row || '?'}: ${err.message || 'Error'}`;
                 }).join('<br>');
@@ -111,16 +111,22 @@ syncBtn.addEventListener("click", async () => {
             if (worksResult.errors && Array.isArray(worksResult.errors) && worksResult.errors.length) {
                 const worksErrors = worksResult.errors.map(err => {
                     if (err.type === 'missing-title') {
-                        return `Row ${err.row}, Column "${err.column}" — ${err.message} "${err.isrc}"`;
+                        return `Row ${err.row}, Column "${err.column}" - ${err.message} "${err.isrc}"`;
                     }
                     if (err.type === 'missing-isrc') {
-                        return `Row ${err.row}, Column "${err.column}" — ${err.message}`;
+                        return `Row ${err.row}, Column "${err.column}" - ${err.message}`;
                     }
                     if (err.type === 'duplicate-isrc') {
-                        return `Row ${err.row}, Column "${err.column}" — ${err.message} "${err.isrc}"`;
+                        return `Row ${err.row}, Column "${err.column}" - ${err.message} "${err.isrc}"`;
                     }
                     if (err.type === 'incorrect-isrc') {
-                        return `Row ${err.row}, Column "${err.column}" — ${err.message} "${err.isrc}"`;
+                        return `Row ${err.row}, Column "${err.column}" - ${err.message} "${err.isrc}"`;
+                    }
+                    if (err.type === 'missing-firstName') {
+                        return `Row ${err.row}, Column "${err.column}" - ${err.message}, (Will be: "firstName" + ${err.lastName})`;
+                    }
+                    if (err.type === 'missing-lastName') {
+                        return `Row ${err.row}, Column "${err.column}" - ${err.message}, (Will be: ${err.firstName} + "lastName")`;
                     }
                     return `Row ${err.row || '?'}: ${err.message || 'Error'}`;
                 }).join('<br>');

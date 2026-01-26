@@ -7,7 +7,8 @@ router.post('/', async (req, res) => {
     try {
         const inputSheetId = req.body.sheetIdInput;
         const sheetIdWorks = req.body.sheetIdWorks;
-        const result = await mergeToIPChain(inputSheetId, sheetIdWorks);
+        const isLabel = req.body.isLabel || false;
+        const result = await mergeToIPChain(inputSheetId, sheetIdWorks, isLabel);
 
         if (!result.ok) {
             return res.status(400).json({

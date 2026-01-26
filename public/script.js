@@ -2,6 +2,7 @@ const sheetIdInput = document.querySelector("#sheetInputId");
 const createBtn = document.querySelector("#createBtn");
 const statusP = document.querySelector("#status");
 const syncBtn = document.querySelector("#syncBtn");
+const isLabelCheckbox = document.querySelector("#isLabelCheckbox");
 
 let newSheetTrackId = '';
 let newSheetWorksId = '';
@@ -84,7 +85,8 @@ syncBtn.addEventListener("click", async () => {
                 },
                 body: JSON.stringify({
                     sheetIdInput: sheetIdValue,
-                    sheetIdWorks: newSheetWorksId
+                    sheetIdWorks: newSheetWorksId,
+                    isLabel: isLabelCheckbox.checked
                 })
             })
         ]);

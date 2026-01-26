@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {mergeToWorks} from "./mergeToWorks.js";
+import {mergeToIPChain} from "./mergeToIPChain.js";
 
 const router = Router();
 
@@ -7,7 +7,7 @@ router.post('/', async (req, res) => {
     try {
         const inputSheetId = req.body.sheetIdInput;
         const sheetIdWorks = req.body.sheetIdWorks;
-        const result = await mergeToWorks(inputSheetId, sheetIdWorks);
+        const result = await mergeToIPChain(inputSheetId, sheetIdWorks);
 
         if (!result.ok) {
             return res.status(400).json({
@@ -20,7 +20,7 @@ router.post('/', async (req, res) => {
 
         res.status(200).json({ success: true });
     } catch (err) {
-        console.error('Error sync to Works', err);
+        console.error('Error sync to IP Chain', err);
         res.status(400).json({ success: false, error: 'Something went wrong' });
     }
 })

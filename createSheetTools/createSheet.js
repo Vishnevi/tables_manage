@@ -456,7 +456,7 @@ export async function createWorksSheet() {
                                     startIndex: 0,
                                     endIndex: TEMPLATE_WR[el.properties.title][0].length
                                 },
-                                properties: { pixelSize: 300 },
+                                properties: { pixelSize: 200 },
                                 fields: 'pixelSize'
                             }
                         }

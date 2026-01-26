@@ -1,4 +1,4 @@
-const sheetIdInput = document.querySelector("#sheetId");
+const sheetIdInput = document.querySelector("#sheetInputId");
 const createBtn = document.querySelector("#createBtn");
 const statusP = document.querySelector("#status");
 const syncBtn = document.querySelector("#syncBtn");
@@ -56,7 +56,7 @@ syncBtn.addEventListener("click", async () => {
     statusP.innerText = 'Syncing...';
 
     try {
-        const [trackResponse, worksResponse] = await Promise.all([
+        const [trackResponse, worksResponse, ipChainResponse] = await Promise.all([
             fetch('/sync-track', {
                 method: 'POST',
                 headers: {
@@ -76,11 +76,22 @@ syncBtn.addEventListener("click", async () => {
                     sheetIdInput: sheetIdValue,
                     sheetIdWorks: newSheetWorksId
                 })
+            }),
+            fetch('/sync-ipchain', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    sheetIdInput: sheetIdValue,
+                    sheetIdWorks: newSheetWorksId
+                })
             })
         ]);
 
         const trackResult = await trackResponse.json();
         const worksResult = await worksResponse.json();
+        const ipChainResult = await ipChainResponse.json();
 
         let errorMessages = [];
 
@@ -101,7 +112,7 @@ syncBtn.addEventListener("click", async () => {
                     }
                     return `Row ${err.row || '?'}: ${err.message || 'Error'}`;
                 }).join('<br>');
-                errorMessages.push('❌ <b>Track ISRC errors:</b><br>' + trackErrors);
+                errorMessages.push('❌ <b>Track errors:</b><br>' + trackErrors);
             } else {
                 errorMessages.push('❌ Sync to track failed!');
             }
@@ -130,9 +141,28 @@ syncBtn.addEventListener("click", async () => {
                     }
                     return `Row ${err.row || '?'}: ${err.message || 'Error'}`;
                 }).join('<br>');
-                errorMessages.push('❌ <b>Works ISRC errors:</b><br>' + worksErrors);
+                errorMessages.push('❌ <b>Works errors:</b><br>' + worksErrors);
             } else {
                 errorMessages.push('❌ Sync to works failed!');
+            }
+        }
+
+        if (!ipChainResponse.ok) {
+            if (ipChainResult.errors && Array.isArray(ipChainResult.errors) && ipChainResult.errors.length) {
+                const ipChainErrors = ipChainResult.errors.map(err => {
+                    if (err.type === 'missing-lastName') {
+                        return `Row ${err.row}, Column "${err.column}" - ${err.message}`;
+                    }
+                    if (err.type === 'missing-firstName') {
+                        return `Row ${err.row}, Column "${err.column}" - ${err.message}`;
+                    }
+                    if (err.type === 'incorrect-share') {
+                        return `Row ${err.row}, Column "${err.column}" - ${err.message} Expected: ${err.expected}, Actual: ${err.actual}`;
+                    }
+                }).join('<br>');
+                errorMessages.push('❌ <b>IP Chain errors:</b><br>' + ipChainErrors);
+            } else {
+                errorMessages.push('❌ Sync to Ip Chain failed!')
             }
         }
 
@@ -141,7 +171,7 @@ syncBtn.addEventListener("click", async () => {
             return;
         }
 
-        if (trackResult.success && worksResult.success) {
+        if (trackResult.success && worksResult.success && ipChainResult.success) {
             statusP.innerText = '✅ Sync successfully!';
         } else {
             statusP.innerText = '❌ Sync failed!';

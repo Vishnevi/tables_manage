@@ -10,7 +10,7 @@ router.post('/', async (req, res) => {
         const result = await mergeToTrack(inputSheetId, sheetIdTrack);
 
         if (!result.ok) {
-            res.status(400).json({
+            return res.status(400).json({
                 success: false,
                 errors: result.errors || [],
                 error: result.error,

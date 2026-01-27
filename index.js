@@ -1,7 +1,7 @@
+import 'dotenv/config';
 import express from 'express';
 import logger from "./core/logger.js";
 import parseResponse from "./core/parseResponse.js";
-import { google } from "googleapis";
 import path from 'path';
 import { fileURLToPath } from 'url';
 import routes from "./core/routes.js";

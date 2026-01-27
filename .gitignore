@@ -4,3 +4,4 @@
 /secrets/client_secret.json
 /secrets/token.json
 /secrets/
+.env

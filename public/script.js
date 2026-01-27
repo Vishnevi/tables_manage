@@ -18,11 +18,18 @@ createBtn.addEventListener("click", async () => {
         const response = await fetch('/create-sheet', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
             },
             body: JSON.stringify({sheetId: sheetIdValue})
         });
 
+
+        if (response.status === 401) {
+            localStorage.removeItem('auth_token');
+            window.location.href = '/login.html';
+            return;
+        }
 
         const result = await response.json();
 
@@ -61,7 +68,8 @@ syncBtn.addEventListener("click", async () => {
             fetch('/sync-track', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
                 },
                 body: JSON.stringify({
                     sheetIdInput: sheetIdValue,
@@ -71,7 +79,8 @@ syncBtn.addEventListener("click", async () => {
             fetch('/sync-works', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
                 },
                 body: JSON.stringify({
                     sheetIdInput: sheetIdValue,
@@ -81,7 +90,8 @@ syncBtn.addEventListener("click", async () => {
             fetch('/sync-ipchain', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
                 },
                 body: JSON.stringify({
                     sheetIdInput: sheetIdValue,
@@ -90,6 +100,12 @@ syncBtn.addEventListener("click", async () => {
                 })
             })
         ]);
+
+        if (trackResponse.status === 401 || worksResponse.status === 401 || ipChainResponse.status === 401) {
+            localStorage.removeItem('auth_token');
+            window.location.href = '/login.html';
+            return;
+        }
 
         const trackResult = await trackResponse.json();
         const worksResult = await worksResponse.json();

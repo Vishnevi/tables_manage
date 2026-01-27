@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Home</title>
+    <script>
+        if (!localStorage.getItem('auth_token')) {
+            window.location.href = '/login.html';
+        }
+    </script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>

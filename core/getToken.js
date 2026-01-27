@@ -18,8 +18,8 @@ async function main() {
     process.stdin.once('data', async (buf) => {
         const code = buf.toString().trim();
         const { tokens } = await oAuth2.getToken(code);
-        await fs.writeFile('./token.json', JSON.stringify(tokens));
-        console.log('\nSaved token.json');
+        await fs.writeFile('./secrets/token.json', JSON.stringify(tokens, null, 2));
+        console.log('\n✅ Saved to secrets/token.json');
         process.exit(0);
     });
 }

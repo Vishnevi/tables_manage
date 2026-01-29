@@ -332,7 +332,7 @@ export async function mergeToIPChain(inputSheetId, sheetIdWorks, isLabel = false
                 columnData.N.push([100]);
                 columnData.O.push([isLabel ? 0 : 50]);
                 columnData.P.push([50]);
-                columnData.Q.push(['Original Publisher']);
+                columnData.Q.push(['Sub Publisher']);
 
                 if (isLabel) {
                     //SUBPUBLISHER на Participant 2
@@ -710,7 +710,7 @@ export async function mergeToIPChain(inputSheetId, sheetIdWorks, isLabel = false
                 columnData.N.push([mixedValues.publisher.N]);
                 columnData.O.push([isLabel ? 0 : mixedValues.publisher.O]);
                 columnData.P.push([mixedValues.publisher.P]);
-                columnData.Q.push(['Original Publisher']);
+                columnData.Q.push(['Sub Publisher']);
 
                 if (isLabel) {
                     //SUBPUBLISHER на Participant 2

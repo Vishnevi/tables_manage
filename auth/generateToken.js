@@ -16,6 +16,7 @@ async function main() {
 
     const authUrl = oAuth2.generateAuthUrl({
         access_type: 'offline',
+        prompt: 'consent',
         scope: SCOPES
     });
 

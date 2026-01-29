@@ -11,7 +11,7 @@ async function main() {
     const { client_id, client_secret, redirect_uris } = creds.installed;
     const oAuth2 = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
 
-    const authUrl = oAuth2.generateAuthUrl({ access_type: 'offline', scope: SCOPES });
+    const authUrl = oAuth2.generateAuthUrl({ access_type: 'offline', prompt: 'consent', scope: SCOPES });
     console.log('\nOpen this URL in browser:\n', authUrl);
     process.stdout.write('\nPaste the code here: ');
 

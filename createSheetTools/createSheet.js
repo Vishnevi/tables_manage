@@ -258,7 +258,7 @@ const TEMPLATE_WR = {
 
 export async function createTrackSheet() {
     const authClient = await getUserAuth(); // мой gmail
-    const drive  = google.drive({version: 'v3', auth: authClient});
+    const drive = google.drive({version: 'v3', auth: authClient});
     const sheets = google.sheets({version: 'v4', auth: authClient});
 
     const createResp = await drive.files.create({
@@ -276,7 +276,7 @@ export async function createTrackSheet() {
     requests.push({ updateSheetProperties: {
             properties: { sheetId: 0, title: sheetTitles[0] },
             fields: 'title'
-        }});
+    }});
 
     for (let i = 1; i < sheetTitles.length; i++) {
         requests.push({ addSheet: { properties: { title: sheetTitles[i] } } });
@@ -377,7 +377,7 @@ export async function createTrackSheet() {
 
 export async function createWorksSheet() {
     const authClient = await getUserAuth(); // мой gmail
-    const drive  = google.drive({version: 'v3', auth: authClient});
+    const drive = google.drive({version: 'v3', auth: authClient});
     const sheets = google.sheets({version: 'v4', auth: authClient});
 
     //создаем таблицу (пустую)
@@ -399,7 +399,7 @@ export async function createWorksSheet() {
     requests.push({ updateSheetProperties: {
             properties: { sheetId: 0, title: sheetTitles[0] },
             fields: 'title'
-        }});
+    }});
 
     //создаем остальные листы не считая первый Works
     for (let i = 1; i < sheetTitles.length; i++) {

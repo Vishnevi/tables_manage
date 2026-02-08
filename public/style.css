@@ -11,6 +11,11 @@ body {
     align-items: center;
 }
 
+hr {
+    align-self: stretch;
+    margin: 10px 0 45px 0;
+}
+
 #sheetInputId {
     width: 500px;
     padding: 15px;

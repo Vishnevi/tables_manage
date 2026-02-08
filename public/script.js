@@ -1,4 +1,4 @@
-const sheetIdInput = document.querySelector("#sheetInputId");
+export const sheetIdInput = document.querySelector("#sheetInputId");
 const createBtn = document.querySelector("#createBtn");
 const statusP = document.querySelector("#status");
 const syncBtn = document.querySelector("#syncBtn");
@@ -8,9 +8,6 @@ let newSheetTrackId = '';
 let newSheetWorksId = '';
 
 createBtn.addEventListener("click", async () => {
-    const sheetIdValue = sheetIdInput.value.trim();
-
-    if (!sheetIdValue) statusP.innerText = 'Please enter a sheet id!';
 
     statusP.innerText = 'Creating Sheet...';
 
@@ -20,8 +17,7 @@ createBtn.addEventListener("click", async () => {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
-            },
-            body: JSON.stringify({sheetId: sheetIdValue})
+            }
         });
 
 
@@ -120,7 +116,7 @@ syncBtn.addEventListener("click", async () => {
                         return `Row ${err.row}, Column "${err.column}" - ${err.message} "${err.isrc}"`;
                     }
                     if (err.type === 'missing-isrc') {
-                        return `Row ${err.row}, Column "${err.column}" - ${err.message}`;
+                        return `Row ${err.row}, Column "${err.column}" - ${err.message} "${err.title}"`;
                     }
                     if (err.type === 'duplicate-isrc') {
                         return `Row ${err.row}, Column "${err.column}" - ${err.message} "${err.isrc}"`;
@@ -143,7 +139,7 @@ syncBtn.addEventListener("click", async () => {
                         return `Row ${err.row}, Column "${err.column}" - ${err.message} "${err.isrc}"`;
                     }
                     if (err.type === 'missing-isrc') {
-                        return `Row ${err.row}, Column "${err.column}" - ${err.message}`;
+                        return `Row ${err.row}, Column "${err.column}" - ${err.message} "${err.title}"`;
                     }
                     if (err.type === 'duplicate-isrc') {
                         return `Row ${err.row}, Column "${err.column}" - ${err.message} "${err.isrc}"`;

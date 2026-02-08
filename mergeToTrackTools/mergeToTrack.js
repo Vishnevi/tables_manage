@@ -120,7 +120,7 @@ export async function mergeToTrack(inputSheetId, sheetIdTrack) { // ПРИНЯЛ
        });
 
        if (errors.length > 0) {
-           console.error('ISRC validation errors:', errors);
+           console.error('ISRC or title validation errors:', errors);
            return {ok: false, errors};
        }
 

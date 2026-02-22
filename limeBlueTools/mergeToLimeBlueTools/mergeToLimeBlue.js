@@ -4,7 +4,7 @@ import { auth } from "../../auth/authClient.js"
 const LABEL_MAPPING = {
     1: ['Timeless Moment', 'MUDRA'],
     2: ['Beatlick', 'Intricate Cuts', 'Intricate Records', 'Moscow Vibes', 'Red Ninjas', 'SkyTop'],
-    3: ['HOROSHO'],
+    3: ['HOROSHO.'],
     4: ['Lostcolor'],
     5: []
 };

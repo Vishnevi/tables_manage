@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lime Blue</title>
+    <script>
+        if (!localStorage.getItem('auth_token')) {
+            window.location.href = '/login.html';
+        }
+    </script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="page">
+    <header>
+        <div class="headerContainer">
+            <nav>
+                <ul class="menu">
+                    <li><a href="index.html">Songs</a></li>
+                    <li><a href="limeBlue.html">Lime Blue</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <label for="sheetInputId"></label>
+        <input type="text" id="sheetInputId" placeholder="Sheet ID">
+        <div class="buttons">
+            <button id="createLBBtn">Create Lime Blue</button>
+            <button id="syncLBBtn">Sync Lime Blue</button>
+        </div>
+        <p id="statusLB"></p>
+    </div>
+    <script type="module" src="limeBlueScript.js"></script>
+</div>
+</body>
+</html>

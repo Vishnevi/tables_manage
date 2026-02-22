@@ -27,32 +27,37 @@ export async function mergeToIPChain(inputSheetId, sheetIdWorks, isLabel = false
             {
                 firstName: 89, middleName: 90, lastName: 91, collect: 96,
                 share: 92, capacity: 93, ipi: 95,
+                publisherName: 97, publisherIpi: 98,
                 name: 'Author 1',
-                columns: { firstName: 'CL', lastName: 'CN', collect: 'CS', share: 'CO', type: 'CP', ipi: 'CR' }
+                columns: { firstName: 'CL', lastName: 'CN', collect: 'CS', share: 'CO', type: 'CP', ipi: 'CR', publisherName: 'CT', publisherIpi: 'CU' }
             },
             {
                 firstName: 99, middleName: 100, lastName: 101, collect: 106,
                 share: 102, capacity: 103, ipi: 105,
+                publisherName: 107, publisherIpi: 108,
                 name: 'Author 2',
-                columns: { firstName: 'CV', lastName: 'CX', collect: 'DC', share: 'CY', type: 'CZ', ipi: 'DB' }
+                columns: { firstName: 'CV', lastName: 'CX', collect: 'DC', share: 'CY', type: 'CZ', ipi: 'DB', publisherName: 'DD', publisherIpi: 'DE' }
             },
             {
                 firstName: 109, middleName: 110, lastName: 111, collect: 116,
                 share: 112, capacity: 113, ipi: 115,
+                publisherName: 117, publisherIpi: 118,
                 name: 'Author 3',
-                columns: { firstName: 'DF', lastName: 'DH', collect: 'DM', share: 'DI', type: 'DJ', ipi: 'DL' }
+                columns: { firstName: 'DF', lastName: 'DH', collect: 'DM', share: 'DI', type: 'DJ', ipi: 'DL', publisherName: 'DN', publisherIpi: 'DO' }
             },
             {
                 firstName: 119, middleName: 120, lastName: 121, collect: 126,
                 share: 122, capacity: 123, ipi: 125,
+                publisherName: 127, publisherIpi: 128,
                 name: 'Author 4',
-                columns: { firstName: 'DP', lastName: 'DR', collect: 'DW', share: 'DS', type: 'DT', ipi: 'DV' }
+                columns: { firstName: 'DP', lastName: 'DR', collect: 'DW', share: 'DS', type: 'DT', ipi: 'DV', publisherName: 'DX', publisherIpi: 'DY' }
             },
             {
                 firstName: 129, middleName: 130, lastName: 131, collect: 136,
                 share: 132, capacity: 133, ipi: 135,
+                publisherName: 137, publisherIpi: 138,
                 name: 'Author 5',
-                columns: { firstName: 'DZ', lastName: 'EB', collect: 'EG', share: 'EC', type: 'ED', ipi: 'EF' }
+                columns: { firstName: 'DZ', lastName: 'EB', collect: 'EG', share: 'EC', type: 'ED', ipi: 'EF', publisherName: 'EH', publisherIpi: 'EI' }
             },
         ];
 
@@ -223,6 +228,7 @@ export async function mergeToIPChain(inputSheetId, sheetIdWorks, isLabel = false
         };
 
         const errors = [];
+        const warnings = [];
 
         //все колонки
         const columnData = {
@@ -270,6 +276,15 @@ export async function mergeToIPChain(inputSheetId, sheetIdWorks, isLabel = false
 
 
                 if (firstName && lastName) {
+                    if (collect !== 'Y' && collect !== 'N') {
+                        errors.push({
+                            type: 'missing-collect',
+                            message: `❌ Missing or invalid collect value for ${author.name} (expected Y or N)`,
+                            row: rowNumber,
+                            column: author.columns.collect
+                        });
+                    }
+
                     validAuthors.push({
                         ...author,
                         firstName,
@@ -281,9 +296,31 @@ export async function mergeToIPChain(inputSheetId, sheetIdWorks, isLabel = false
                         ipi: row[author.ipi] ? row[author.ipi].trim() : ''
                     });
 
-
                     if (collect === 'Y') {
                         validAuthorsCount++;
+                    }
+
+                    const publisherNameValue = row[author.publisherName] ? row[author.publisherName].trim() : '';
+                    const publisherIpiValue = row[author.publisherIpi] ? row[author.publisherIpi].trim() : '';
+
+                    if (publisherNameValue === 'Topgunmusic Corp') {
+                        if (collect !== 'Y') {
+                            errors.push({
+                                type: 'publisher-collect-mismatch',
+                                message: `❌ Publisher Name is "Topgunmusic Corp" for ${author.name} but collect is not Y`,
+                                row: rowNumber,
+                                column: author.columns.collect
+                            });
+                        }
+                        if (publisherIpiValue !== '1092871243') {
+                            errors.push({
+                                type: 'publisher-ipi-invalid',
+                                message: `❌ Publisher Name is "Topgunmusic Corp" for ${author.name} but publisher IPI is not 1092871243`,
+                                row: rowNumber,
+                                column: author.columns.publisherIpi,
+                                actual: publisherIpiValue
+                            });
+                        }
                     }
                 }
             });
@@ -296,23 +333,30 @@ export async function mergeToIPChain(inputSheetId, sheetIdWorks, isLabel = false
 
             const allAuthorsHaveY = validAuthors.length > 0 && countN === 0;
 
+            //проверка суммы долей = 100 для всех случаев
+            if (validAuthors.length > 0) {
+                const totalShare = validAuthors.reduce((sum, a) => sum + a.share, 0);
+                if (Math.abs(totalShare - 100) >= 0.01) {
+                    errors.push({
+                        type: 'share-sum-invalid',
+                        message: `❌ Total author shares sum to ${totalShare}, expected 100`,
+                        row: rowNumber
+                    });
+                }
+            }
+
             if (allAuthorsHaveY && validAuthorsCount > 0) {
                 const expected = expectedShares[validAuthorsCount];
                 if (expected) {
-                    for (let i = 0; i < validAuthorsCount; i++) {
-                        const authorShare = validAuthors[i].share;
-                        const expectedShare = expected[i];
-
-                        if (authorShare !== expectedShare) {
-                            errors.push({
-                                type: 'incorrect-share',
-                                message: `❌ Incorrect share percentage for ${validAuthors[i].name}`,
-                                row: rowNumber,
-                                column: validAuthors[i].columns.share,
-                                expected: expectedShare,
-                                actual: authorShare
-                            });
-                        }
+                    const isNonStandard = validAuthors.some((a, i) => a.share !== expected[i]);
+                    if (isNonStandard) {
+                        warnings.push({
+                            type: 'non-standard-shares',
+                            message: `⚠️ Non-standard share`,
+                            row: rowNumber,
+                            actual: validAuthors.map(a => ({ name: a.name, column: a.columns.share, share: a.share })),
+                            expected: expected
+                        });
                     }
                 }
 
@@ -892,7 +936,6 @@ export async function mergeToIPChain(inputSheetId, sheetIdWorks, isLabel = false
 
                         const writerShare = author.share;
 
-                        console.log(`N author ${i}: cols.type=${cols.type}, cols.name=${cols.name}, fullName=${fullName}`);
                         columnData[cols.type].push(['Composer']);
                         columnData[cols.name].push([fullName]);
                         columnData[cols.firstName].push([author.firstName]);
@@ -955,10 +998,14 @@ export async function mergeToIPChain(inputSheetId, sheetIdWorks, isLabel = false
             }
         });
 
-        //ошибки
+        //ошибки и варны
         if (errors.length > 0) {
             console.error('Validation errors:', errors);
-            return {ok: false, errors};
+            return {ok: false, errors, warnings};
+        }
+
+        if (warnings.length > 0) {
+            console.warn('Validation warnings:', warnings);
         }
 
 
@@ -984,7 +1031,7 @@ export async function mergeToIPChain(inputSheetId, sheetIdWorks, isLabel = false
             });
         }
 
-        return {ok: true};
+        return {ok: true, warnings};
 
     } catch (err) {
         console.error(err);

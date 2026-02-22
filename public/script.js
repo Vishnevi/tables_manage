@@ -170,13 +170,23 @@ syncBtn.addEventListener("click", async () => {
                     if (err.type === 'missing-firstName') {
                         return `Row ${err.row}, Column "${err.column}" - ${err.message}`;
                     }
-                    if (err.type === 'incorrect-share') {
-                        return `Row ${err.row}, Column "${err.column}" - ${err.message} Expected: ${err.expected}, Actual: ${err.actual}`;
+                    if (err.type === 'share-sum-invalid') {
+                        return `Row ${err.row} - ${err.message}`;
                     }
+                    if (err.type === 'missing-collect') {
+                        return `Row ${err.row}, Column "${err.column}" - ${err.message}`;
+                    }
+                    if (err.type === 'publisher-collect-mismatch') {
+                        return `Row ${err.row}, Column "${err.column}" - ${err.message}`;
+                    }
+                    if (err.type === 'publisher-ipi-invalid') {
+                        return `Row ${err.row}, Column "${err.column}" - ${err.message} Actual: ${err.actual}`;
+                    }
+                    return `Row ${err.row || '?'}: ${err.message || 'Error'}`;
                 }).join('<br>');
                 errorMessages.push('❌ <b>IP Chain errors:</b><br>' + ipChainErrors);
             } else {
-                errorMessages.push('❌ Sync to Ip Chain failed!')
+                errorMessages.push('❌ Sync to Ip Chain failed!');
             }
         }
 
@@ -185,8 +195,26 @@ syncBtn.addEventListener("click", async () => {
             return;
         }
 
+        let warningMessages = [];
+
+        if (ipChainResult.warnings && Array.isArray(ipChainResult.warnings) && ipChainResult.warnings.length) {
+            const ipChainWarnings = ipChainResult.warnings.map(warn => {
+                if (warn.type === 'non-standard-shares') {
+                    const actualShares = warn.actual.map(a => `${a.name} (col ${a.column}): ${a.share}%`).join(', ');
+                    const expectedShares = warn.expected.join('/');
+                    return `Row ${warn.row} - ${warn.message}: ${actualShares}, expected: ${expectedShares}`;
+                }
+                return `Row ${warn.row || '?'}: ${warn.message || 'Warning'}`;
+            }).join('<br>');
+            warningMessages.push('⚠️ <b>IP Chain warnings:</b><br>' + ipChainWarnings);
+        }
+
         if (trackResult.success && worksResult.success && ipChainResult.success) {
-            statusP.innerText = '✅ Sync successfully!';
+            let statusHtml = '✅ Sync successfully!';
+            if (warningMessages.length > 0) {
+                statusHtml += '<br><br>' + warningMessages.join('<br><br>');
+            }
+            statusP.innerHTML = statusHtml;
         } else {
             statusP.innerText = '❌ Sync failed!';
         }

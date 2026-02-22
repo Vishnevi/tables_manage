@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Home</title>
+    <title>Songs</title>
     <script>
         if (!localStorage.getItem('auth_token')) {
             window.location.href = '/login.html';
@@ -11,6 +11,17 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<div class="page">
+    <header>
+        <div class="headerContainer">
+        <nav>
+            <ul class="menu">
+                <li><a href="index.html">Songs</a></li>
+                <li><a href="limeBlue.html">Lime Blue</a></li>
+            </ul>
+        </nav>
+        </div>
+    </header>
     <div class="container">
         <label for="sheetInputId"></label>
         <input type="text" id="sheetInputId" placeholder="Sheet ID">
@@ -36,5 +47,6 @@
 
     <script type="module" src="script.js"></script>
     <script type="module" src="zvonkoScript.js"></script>
+</div>
 </body>
 </html>

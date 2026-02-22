@@ -5,6 +5,8 @@ import mergeToIPChain from "../mergeToIPChainTools/mergeToIPChainRoutes.js";
 import authRoutes from "../auth/authRoutes.js";
 import createZvonko from "../zvonkoTools/createSheetZvonkoTools/createZvonkoRoutes.js";
 import mergeToZvonko from "../zvonkoTools/mergeZvonkoTools/mergeToZvonkoRoutes.js";
+import createLB from "../limeBlueTools/createLimeBlueTools/createLimeBlueRoutes.js";
+import mergeLB from "../limeBlueTools/mergeToLimeBlueTools/mergeToLimeBlueRoutes.js"
 import { verifyToken } from "../auth/authMiddleware.js";
 
 
@@ -16,4 +18,6 @@ export default function routes(app){
     app.use('/sync-ipchain', verifyToken, mergeToIPChain);
     app.use('/create-zvonko', verifyToken, createZvonko);
     app.use('/sync-zvonko', verifyToken, mergeToZvonko);
+    app.use('/create-LB', verifyToken, createLB);
+    app.use('/sync-LB', verifyToken, mergeLB);
 }

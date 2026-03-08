@@ -94,6 +94,9 @@ syncZvonkoBtn.addEventListener('click', async () => {
                     if (err.type === 'incorrect-share') {
                         return `Row ${err.row}, Column "${err.column}" - ${err.message} Expected: ${err.expected}, Actual: ${err.actual}`;
                     }
+                    if (err.type === 'incorrect-isrc') {
+                        return `Row ${err.row}, Column "${err.column}" - ${err.message} "${err.isrc}"`;
+                    }
                 }).join('<br>');
                 statusZvonko.innerHTML = '❌ <b>Zvonko errors:</b><br>' + zvonkoErrors;
             } else {

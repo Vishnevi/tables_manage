@@ -35,7 +35,9 @@ export async function mergeToWorks(inputSheetId, sheetIdWorks) {
         const rateOutput = []; //Лист Participators - Rate (F)
 
         const errors = [];
+        const warnings = [];
         const ISRCMap = {};
+        const songTitleMap = {};
 
         rows.forEach((row, rowIndex) => {
             //Лист Works
@@ -44,12 +46,30 @@ export async function mergeToWorks(inputSheetId, sheetIdWorks) {
             const trimmedSongTitle = songTitle ? songTitle.trim() : '';
             songTitleOutput.push([trimmedSongTitle]);
 
+
             //Territories
             territoriesOutput.push([trimmedSongTitle ? 'WW' : '']);
 
-            //Composers
             const rowComposers = [];
             const rowNumber = rowIndex + 3;
+
+            //Варн дубликата SongTitle
+            if (trimmedSongTitle) {
+                const titleKey = trimmedSongTitle.toLowerCase();
+                if (!songTitleMap[titleKey]) {
+                    songTitleMap[titleKey] = { firstRow: rowNumber };
+                } else {
+                    warnings.push({
+                        type: 'duplicate-title',
+                        message: `⚠️ Duplicate song title (first seen at row ${songTitleMap[titleKey].firstRow})`,
+                        row: rowNumber,
+                        column: 'A',
+                        title: trimmedSongTitle
+                    });
+                }
+            }
+
+            //Composers
             for (let i = 0; i < composersColumnIndexes.length; i += 3) {
                 const firstNameIndex = composersColumnIndexes[i];
                 const middleNameIndex = composersColumnIndexes[i + 1];
@@ -279,7 +299,7 @@ export async function mergeToWorks(inputSheetId, sheetIdWorks) {
         });
 
 
-        return {ok: true};
+        return {ok: true, warnings};
 
     } catch (err) {
         console.error(err);

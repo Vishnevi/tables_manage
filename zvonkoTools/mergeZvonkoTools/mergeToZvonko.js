@@ -40,7 +40,9 @@ export async function mergeToZvonko(inputSheetId, sheetIdZvonko) {
         const platformOutput = [];
 
         const errors = [];
+        const warnings = [];
         const ISRCMap = {};
+        const songTitleMap = {};
 
         rows.forEach((row, rowIndex) => {
             //Artists
@@ -54,6 +56,25 @@ export async function mergeToZvonko(inputSheetId, sheetIdZvonko) {
             const validComposers = [];
             let totalShareY = 0;
             const rowNumber = rowIndex + 3;
+
+            //Варн дубликата SongTitle
+            const songTitle = row[0];
+            const trimmedSongTitle = songTitle ? songTitle.trim() : '';
+
+            if (trimmedSongTitle) {
+                const titleKey = trimmedSongTitle.toLowerCase();
+                if (!songTitleMap[titleKey]) {
+                    songTitleMap[titleKey] = { firstRow: rowNumber };
+                } else {
+                    warnings.push({
+                        type: 'duplicate-title',
+                        message: `⚠️ Duplicate song title (first seen at row ${songTitleMap[titleKey].firstRow})`,
+                        row: rowNumber,
+                        column: 'A',
+                        title: trimmedSongTitle
+                    });
+                }
+            }
 
             for (let i = 0; i < composersColumnIndexes.length; i += 3) {
                 const composerIndex = i / 3;
@@ -311,7 +332,7 @@ export async function mergeToZvonko(inputSheetId, sheetIdZvonko) {
             }
         });
 
-        return {ok: true};
+        return {ok: true, warnings};
 
     } catch (err) {
         console.error(err);

@@ -209,6 +209,28 @@ syncBtn.addEventListener("click", async () => {
             warningMessages.push('⚠️ <b>IP Chain warnings:</b><br>' + ipChainWarnings);
         }
 
+        if (worksResult.warnings && Array.isArray(worksResult.warnings) && worksResult.warnings.length) {
+            const worksWarnings = worksResult.warnings.map(warn => {
+                if (warn.type === 'duplicate-title') {
+                    return `Row ${warn.row}, Column "${warn.column}" - ${warn.message} "${warn.title}"`;
+                }
+                return `Row ${warn.row || '?'}: ${warn.message || 'Warning'}`;
+            }).join('<br>');
+            warningMessages.push('⚠️ <b>Works warnings:</b><br>' + worksWarnings);
+        }
+
+        if (trackResult.warnings && Array.isArray(trackResult.warnings) && trackResult.warnings.length) {
+            const trackWarnings = trackResult.warnings.map(warn => {
+                if (warn.type === 'duplicate-title') {
+                    return `Row ${warn.row}, Column "${warn.column}" - ${warn.message} "${warn.title}"`;
+                }
+                return `Row ${warn.row || '?'}: ${warn.message || 'Warning'}`;
+            }).join('<br>');
+            warningMessages.push('⚠️ <b>Track warnings:</b><br>' + trackWarnings);
+        }
+
+
+
         if (trackResult.success && worksResult.success && ipChainResult.success) {
             let statusHtml = '✅ Sync successfully!';
             if (warningMessages.length > 0) {

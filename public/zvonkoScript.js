@@ -105,8 +105,26 @@ syncZvonkoBtn.addEventListener('click', async () => {
             return;
         }
 
+        let warningMessages = [];
+
+        if (result.warnings && Array.isArray(result.warnings) && result.warnings.length) {
+            const warnings = result.warnings.map(warn => {
+                if (warn.type === 'duplicate-title') {
+                    return `Row ${warn.row}, Column "${warn.column}" - ${warn.message} "${warn.title}"`;
+                }
+                return `Row ${warn.row || '?'}: ${warn.message || 'Warning'}`;
+            }).join('<br>');
+            warningMessages.push('⚠️ <b>Zvonko warnings:</b><br>' + warnings);
+        }
+
+
+
         if (result.success) {
-            statusZvonko.innerText = '✅ Sync to Zvonko successfully!';
+            let statusHtml = '✅ Sync to Zvonko successfully!';
+            if (warningMessages.length > 0) {
+                statusHtml += '<br><br>' + warningMessages.join('<br><br>');
+            }
+            statusZvonko.innerHTML = statusHtml;
         } else {
             statusZvonko.innerText = '❌ Sync to Zvonko failed!';
         }

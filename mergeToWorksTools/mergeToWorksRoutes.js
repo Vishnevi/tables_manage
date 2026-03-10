@@ -18,7 +18,7 @@ router.post('/', async (req, res) => {
             });
         }
 
-        res.status(200).json({ success: true });
+        res.status(200).json({ success: true, warnings: result.warnings || [] });
     } catch (err) {
         console.error('Error sync to Works', err);
         res.status(400).json({ success: false, error: 'Something went wrong' });

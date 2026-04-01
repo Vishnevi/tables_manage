@@ -18,7 +18,7 @@
   "bugs": {
     "url": "https://github.com/Vishnevi/tables_manage/issues"
   },
-  "homepage": "https://github.com/Vishnevi/tables_manage#readme",
+  "homepage": "https://github.com/Vishnevi/tables_manage",
   "description": "",
   "dependencies": {
     "body-parser": "^2.2.1",

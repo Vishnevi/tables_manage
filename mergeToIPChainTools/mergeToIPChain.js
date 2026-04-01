@@ -244,7 +244,6 @@ export async function mergeToIPChain(inputSheetId, sheetIdWorks, isLabel = false
         rows.forEach((row, rowIndex) => {
             const rowNumber = rowIndex + 3;
 
-            let validAuthorsCount = 0;
             const validAuthors = [];
 
             authors.forEach((author) => {
@@ -296,9 +295,6 @@ export async function mergeToIPChain(inputSheetId, sheetIdWorks, isLabel = false
                         ipi: row[author.ipi] ? row[author.ipi].trim() : ''
                     });
 
-                    if (collect === 'Y') {
-                        validAuthorsCount++;
-                    }
 
                     const publisherNameValue = row[author.publisherName] ? row[author.publisherName].trim() : '';
                     const publisherIpiValue = row[author.publisherIpi] ? row[author.publisherIpi].trim() : '';
@@ -345,8 +341,8 @@ export async function mergeToIPChain(inputSheetId, sheetIdWorks, isLabel = false
                 }
             }
 
-            if (allAuthorsHaveY && validAuthorsCount > 0) {
-                const expected = expectedShares[validAuthorsCount];
+            if (countY > 0) {
+                const expected = expectedShares[countY];
                 if (expected) {
                     const isNonStandard = validAuthors.some((a, i) => a.share !== expected[i]);
                     if (isNonStandard) {
@@ -359,7 +355,9 @@ export async function mergeToIPChain(inputSheetId, sheetIdWorks, isLabel = false
                         });
                     }
                 }
+            }
 
+            if (allAuthorsHaveY && countY > 0) {
                 const songTitle = row[0] ? row[0].trim() : '';
 
                 //паблишер (всегда есть)
@@ -393,7 +391,7 @@ export async function mergeToIPChain(inputSheetId, sheetIdWorks, isLabel = false
                     columnData.AB.push([0]);
                     columnData.AC.push(['Original Publisher']);
 
-                    const percentages = mechanicalPerformancePercentages[validAuthorsCount];
+                    const percentages = mechanicalPerformancePercentages[countY];
 
                     //автор 1 (isLabel)
                     const author1 = validAuthors[0];
@@ -415,7 +413,7 @@ export async function mergeToIPChain(inputSheetId, sheetIdWorks, isLabel = false
                     columnData.AO.push([getRoleText(author1.capacity)]);
 
                     //автор 2 (isLabel)
-                    if (validAuthorsCount >= 2) {
+                    if (countY >= 2) {
                         const author2 = validAuthors[1];
                         const fullName2 = author2.middleName
                             ? `${author2.firstName} ${author2.middleName} ${author2.lastName}`
@@ -449,7 +447,7 @@ export async function mergeToIPChain(inputSheetId, sheetIdWorks, isLabel = false
                     }
 
                     //автор 3 (isLabel)
-                    if (validAuthorsCount >= 3) {
+                    if (countY >= 3) {
                         const author3 = validAuthors[2];
                         const fullName3 = author3.middleName
                             ? `${author3.firstName} ${author3.middleName} ${author3.lastName}`
@@ -483,7 +481,7 @@ export async function mergeToIPChain(inputSheetId, sheetIdWorks, isLabel = false
                     }
 
                     //автор 4 (isLabel)
-                    if (validAuthorsCount >= 4) {
+                    if (countY >= 4) {
                         const author4 = validAuthors[3];
                         const fullName4 = author4.middleName
                             ? `${author4.firstName} ${author4.middleName} ${author4.lastName}`
@@ -517,7 +515,7 @@ export async function mergeToIPChain(inputSheetId, sheetIdWorks, isLabel = false
                     }
 
                     //автор 5 (isLabel)
-                    if (validAuthorsCount >= 5) {
+                    if (countY >= 5) {
                         const author5 = validAuthors[4];
                         const fullName5 = author5.middleName
                             ? `${author5.firstName} ${author5.middleName} ${author5.lastName}`
@@ -566,13 +564,13 @@ export async function mergeToIPChain(inputSheetId, sheetIdWorks, isLabel = false
                     columnData.Y.push([0]);
                     columnData.Z.push([0]);
 
-                    const percentages = mechanicalPerformancePercentages[validAuthorsCount];
+                    const percentages = mechanicalPerformancePercentages[countY];
                     columnData.AA.push([percentages[0]]);
                     columnData.AB.push([percentages[1]]);
                     columnData.AC.push([getRoleText(author1.capacity)]);
 
                     //автор 2
-                    if (validAuthorsCount >= 2) {
+                    if (countY >= 2) {
                         const author2 = validAuthors[1];
                         const fullName2 = author2.middleName
                             ? `${author2.firstName} ${author2.middleName} ${author2.lastName}`
@@ -607,7 +605,7 @@ export async function mergeToIPChain(inputSheetId, sheetIdWorks, isLabel = false
                     }
 
                     //автор 3
-                    if (validAuthorsCount >= 3) {
+                    if (countY >= 3) {
                         const author3 = validAuthors[2];
                         const fullName3 = author3.middleName
                             ? `${author3.firstName} ${author3.middleName} ${author3.lastName}`
@@ -641,7 +639,7 @@ export async function mergeToIPChain(inputSheetId, sheetIdWorks, isLabel = false
                     }
 
                     //автор 4
-                    if (validAuthorsCount >= 4) {
+                    if (countY >= 4) {
                         const author4 = validAuthors[3];
                         const fullName4 = author4.middleName
                             ? `${author4.firstName} ${author4.middleName} ${author4.lastName}`
@@ -675,7 +673,7 @@ export async function mergeToIPChain(inputSheetId, sheetIdWorks, isLabel = false
                     }
 
                     //автор 5
-                    if (validAuthorsCount >= 5) {
+                    if (countY >= 5) {
                         const author5 = validAuthors[4];
                         const fullName5 = author5.middleName
                             ? `${author5.firstName} ${author5.middleName} ${author5.lastName}`

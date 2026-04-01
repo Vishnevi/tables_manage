@@ -131,20 +131,29 @@ export async function mergeToZvonko(inputSheetId, sheetIdZvonko) {
             }
 
             const composersWithY = validComposers.filter(c => c.collect === 'Y');
-            const composersWithN = validComposers.filter(c => c.collect === 'N');
-            const allComposersHaveY = validComposers.length > 0 && composersWithN.length === 0;
 
-            if (allComposersHaveY && composersWithY.length > 0) {
-                const expected = expectedShares[composersWithY.length];
+            if (validComposers.length > 0) {
+                const totalShare = validComposers.reduce((sum, c) => sum + c.share, 0);
+                if (Math.abs(totalShare - 100) >= 0.01) {
+                    errors.push({
+                        type: 'share-sum-invalid',
+                        message: `❌ Total composer shares sum to ${totalShare}, expected 100`,
+                        row: rowNumber
+                    });
+                }
+            }
+
+            if (composersWithY.length > 0) {
+                const expected = expectedShares[validComposers.length];
                 if (expected) {
-                    for (let i = 0; i < composersWithY.length; i++) {
-                        const composer = composersWithY[i];
+                    for (let i = 0; i < validComposers.length; i++) {
+                        const composer = validComposers[i];
                         const expectedShare = expected[i];
 
                         if (composer.share !== expectedShare) {
-                            errors.push({
-                                type: 'incorrect-share',
-                                message: `❌ Incorrect share percentage for Composer ${composer.composerIndex + 1}`,
+                            warnings.push({
+                                type: 'non-standard-shares',
+                                message: `⚠️ Incorrect share percentage for Composer ${composer.composerIndex + 1}`,
                                 row: rowNumber,
                                 column: shareColumnLetters[composer.composerIndex],
                                 expected: expectedShare,

@@ -91,8 +91,8 @@ syncZvonkoBtn.addEventListener('click', async () => {
                     if (err.type === 'duplicate-isrc') {
                         return `Row ${err.row}, Column "${err.column}" - ${err.message} "${err.isrc}"`;
                     }
-                    if (err.type === 'incorrect-share') {
-                        return `Row ${err.row}, Column "${err.column}" - ${err.message} Expected: ${err.expected}, Actual: ${err.actual}`;
+                    if (err.type === 'share-sum-invalid') {
+                        return `Row ${err.row} - ${err.message}`;
                     }
                     if (err.type === 'incorrect-isrc') {
                         return `Row ${err.row}, Column "${err.column}" - ${err.message} "${err.isrc}"`;
@@ -111,6 +111,9 @@ syncZvonkoBtn.addEventListener('click', async () => {
             const warnings = result.warnings.map(warn => {
                 if (warn.type === 'duplicate-title') {
                     return `Row ${warn.row}, Column "${warn.column}" - ${warn.message} "${warn.title}"`;
+                }
+                if (warn.type === 'non-standard-shares') {
+                    return `Row ${warn.row}, Column "${warn.column}" - ${warn.message} Expected: ${warn.expected}, Actual: ${warn.actual}`;
                 }
                 return `Row ${warn.row || '?'}: ${warn.message || 'Warning'}`;
             }).join('<br>');

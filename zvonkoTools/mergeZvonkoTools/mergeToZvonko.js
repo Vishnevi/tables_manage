@@ -74,16 +74,25 @@ export async function mergeToZvonko(inputSheetId, sheetIdZvonko) {
                         title: trimmedSongTitle
                     });
                 }
-            }
 
-            if (trimmedSongTitle && !trimmedSongTitle.toLowerCase().includes(letters.toLowerCase())) {
-                errors.push({
-                    type: 'incorrect-song-title',
-                    message: '❌ Incorrect song title, title supposed to be in Latin characters',
-                    row: rowNumber,
-                    column: 'A',
-                    title: trimmedSongTitle
-                })
+                //Латинские ли буквы
+                let eachCharacterIsLatin = true;
+                let key = trimmedSongTitle.toLowerCase();
+
+                for (let i = 0; i < key.length; i++) {
+                    if (!letters.toLowerCase().includes(key[i]) && key[i] !== ' ' && !digits.includes(key[i])) eachCharacterIsLatin = false;
+                    if (!eachCharacterIsLatin) break;
+                }
+
+                if (!eachCharacterIsLatin) {
+                    errors.push({
+                        type: 'incorrect-song-title',
+                        message: '❌ Incorrect song title, title supposed to be in Latin characters',
+                        row: rowNumber,
+                        column: 'A',
+                        title: trimmedSongTitle
+                    })
+                }
             }
 
 

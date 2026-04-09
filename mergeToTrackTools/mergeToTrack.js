@@ -54,9 +54,8 @@ export async function mergeToTrack(inputSheetId, sheetIdTrack) { // ПРИНЯЛ
                        title: trimmedSongTitle
                    });
                }
-           }
 
-           if (trimmedSongTitle) {
+               //Латинские ли буквы
                let eachCharacterIsLatin = true;
                let key = trimmedSongTitle.toLowerCase();
 

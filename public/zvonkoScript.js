@@ -97,6 +97,9 @@ syncZvonkoBtn.addEventListener('click', async () => {
                     if (err.type === 'incorrect-isrc') {
                         return `Row ${err.row}, Column "${err.column}" - ${err.message} "${err.isrc}"`;
                     }
+                    if (err.type === 'incorrect-song-title') {
+                        return `Row ${err.row}, Column "${err.column}" - ${err.message} "${err.title}"`;
+                    }
                 }).join('<br>');
                 statusZvonko.innerHTML = '❌ <b>Zvonko errors:</b><br>' + zvonkoErrors;
             } else {

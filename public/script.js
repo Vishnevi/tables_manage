@@ -124,6 +124,9 @@ syncBtn.addEventListener("click", async () => {
                     if (err.type === 'incorrect-isrc') {
                         return `Row ${err.row}, Column "${err.column}" - ${err.message} "${err.isrc}"`;
                     }
+                    if (err.type === 'incorrect-song-title') {
+                        return `Row ${err.row}, Column "${err.column}" - ${err.message} "${err.title}"`;
+                    }
                     return `Row ${err.row || '?'}: ${err.message || 'Error'}`;
                 }).join('<br>');
                 errorMessages.push('❌ <b>Track errors:</b><br>' + trackErrors);
@@ -180,6 +183,9 @@ syncBtn.addEventListener("click", async () => {
                         return `Row ${err.row}, Column "${err.column}" - ${err.message}`;
                     }
                     if (err.type === 'publisher-ipi-invalid') {
+                        return `Row ${err.row}, Column "${err.column}" - ${err.message} Actual: ${err.actual}`;
+                    }
+                    if (err.type === 'writer-capacity-invalid') {
                         return `Row ${err.row}, Column "${err.column}" - ${err.message} Actual: ${err.actual}`;
                     }
                     return `Row ${err.row || '?'}: ${err.message || 'Error'}`;

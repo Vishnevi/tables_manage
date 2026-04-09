@@ -56,6 +56,26 @@ export async function mergeToTrack(inputSheetId, sheetIdTrack) { // ПРИНЯЛ
                }
            }
 
+           if (trimmedSongTitle) {
+               let eachCharacterIsLatin = true;
+               let key = trimmedSongTitle.toLowerCase();
+
+               for (let i = 0; i < key.length; i++) {
+                   if (!letters.toLowerCase().includes(key[i]) && key[i] !== ' ' && !digits.includes(key[i])) eachCharacterIsLatin = false;
+                   if (!eachCharacterIsLatin) break;
+               }
+
+               if (!eachCharacterIsLatin) {
+                   errors.push({
+                       type: 'incorrect-song-title',
+                       message: '❌ Incorrect song title, title supposed to be in Latin characters',
+                       row: rowNumber,
+                       column: 'A',
+                       title: trimmedSongTitle
+                   })
+               }
+           }
+
            titleColumns.forEach((i, colIndex) => {
                const title = row[i];
                const ISRC = row[i + 1]; // ISRC находится на следующем индексе от title

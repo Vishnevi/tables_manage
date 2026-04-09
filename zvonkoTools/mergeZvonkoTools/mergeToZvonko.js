@@ -76,6 +76,17 @@ export async function mergeToZvonko(inputSheetId, sheetIdZvonko) {
                 }
             }
 
+            if (trimmedSongTitle && !trimmedSongTitle.toLowerCase().includes(letters.toLowerCase())) {
+                errors.push({
+                    type: 'incorrect-song-title',
+                    message: '❌ Incorrect song title, title supposed to be in Latin characters',
+                    row: rowNumber,
+                    column: 'A',
+                    title: trimmedSongTitle
+                })
+            }
+
+
             for (let i = 0; i < composersColumnIndexes.length; i += 3) {
                 const composerIndex = i / 3;
 

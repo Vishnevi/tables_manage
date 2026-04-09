@@ -298,6 +298,7 @@ export async function mergeToIPChain(inputSheetId, sheetIdWorks, isLabel = false
 
                     const publisherNameValue = row[author.publisherName] ? row[author.publisherName].trim() : '';
                     const publisherIpiValue = row[author.publisherIpi] ? row[author.publisherIpi].trim() : '';
+                    const writerCapacityValue = row[author.capacity] ? row[author.capacity].trim() : '';
 
                     if (publisherNameValue === 'Topgunmusic Corp') {
                         if (collect !== 'Y') {
@@ -316,6 +317,15 @@ export async function mergeToIPChain(inputSheetId, sheetIdWorks, isLabel = false
                                 column: author.columns.publisherIpi,
                                 actual: publisherIpiValue
                             });
+                        }
+                        if (writerCapacityValue !== 'CA') {
+                            errors.push({
+                                type: 'writer-capacity-invalid',
+                                message: '❌ Writer Capacity for first author supposed to be "CA"',
+                                row: rowNumber,
+                                column: 'CP',
+                                actual: writerCapacityValue
+                            })
                         }
                     }
                 }

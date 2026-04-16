@@ -17,6 +17,7 @@ export async function mergeToTrack(inputSheetId, sheetIdTrack) { // ПРИНЯЛ
         const ISRCColumnLetters = ['K','O','S','W','AA','AE','AI','AM','AQ','AU','AY','BC','BG','BK','BO','BS','BW','CA','CE','CI'];
         const digits = '1234567890';
         const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const symbols = `!"#$%&'()*+,-./:;<=>?@[]^_\`{|}~`;
 
         const artistsOutput = [];
         const titlesOutput = [];
@@ -60,7 +61,7 @@ export async function mergeToTrack(inputSheetId, sheetIdTrack) { // ПРИНЯЛ
                let key = trimmedSongTitle.toLowerCase();
 
                for (let i = 0; i < key.length; i++) {
-                   if (!letters.toLowerCase().includes(key[i]) && key[i] !== ' ' && !digits.includes(key[i])) eachCharacterIsLatin = false;
+                   if (!letters.toLowerCase().includes(key[i]) && key[i] !== ' ' && !digits.includes(key[i]) && !symbols.includes(key[i])) eachCharacterIsLatin = false;
                    if (!eachCharacterIsLatin) break;
                }
 

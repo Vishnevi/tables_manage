@@ -17,7 +17,7 @@ router.post('/login', (req, res) => {
             { expiresIn: '24h' }
         );
 
-        return res.json({ token, message: 'Успешный вход' });
+        return res.json({ token });
     }
 
     return res.status(401).json({ message: 'Неверный логин или пароль' });

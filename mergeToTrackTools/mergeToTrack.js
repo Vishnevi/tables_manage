@@ -17,7 +17,7 @@ export async function mergeToTrack(inputSheetId, sheetIdTrack) { // ПРИНЯЛ
         const ISRCColumnLetters = ['K','O','S','W','AA','AE','AI','AM','AQ','AU','AY','BC','BG','BK','BO','BS','BW','CA','CE','CI'];
         const digits = '1234567890';
         const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        const symbols = `!"#$%&'()*+,-./:;<=>?@[]^_\`{|}~`;
+        const symbols = `!"#$%&'()*+,-./:;<=>?@[]^_\`{|}~’—`;
 
         const artistsOutput = [];
         const titlesOutput = [];

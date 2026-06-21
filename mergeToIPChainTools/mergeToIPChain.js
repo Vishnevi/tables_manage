@@ -3,9 +3,9 @@ import { auth } from "../auth/authClient.js"
 
 //преобразование capacity
 function getRoleText(capacity) {
-    if (capacity === 'CA') return 'Lyrics and Music';
-    if (capacity === 'A') return 'Lyrics';
-    if (capacity === 'C') return 'Music';
+    if (capacity === 'CA' || capacity === 'СА') return 'Lyrics and Music';
+    if (capacity === 'A'|| capacity === 'А') return 'Lyrics';
+    if (capacity === 'C' || capacity === 'С') return 'Music';
     return '';
 }
 
@@ -246,7 +246,7 @@ export async function mergeToIPChain(inputSheetId, sheetIdWorks, isLabel = false
 
             const validAuthors = [];
 
-            authors.forEach((author) => {
+            authors.forEach((author, authorIndex) => {
                 const firstName = row[author.firstName] ? row[author.firstName].trim() : '';
                 const lastName = row[author.lastName] ? row[author.lastName].trim() : '';
                 const collect = row[author.collect] ? row[author.collect].trim().toUpperCase() : '';
@@ -318,7 +318,7 @@ export async function mergeToIPChain(inputSheetId, sheetIdWorks, isLabel = false
                                 actual: publisherIpiValue
                             });
                         }
-                        if (writerCapacityValue !== 'CA') {
+                        if (authorIndex === 0 && writerCapacityValue !== 'CA' && writerCapacityValue !== 'СА') {
                             errors.push({
                                 type: 'writer-capacity-invalid',
                                 message: '❌ Writer Capacity for first author supposed to be "CA"',

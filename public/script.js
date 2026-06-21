@@ -6,6 +6,8 @@ const isLabelCheckbox = document.querySelector("#isLabelCheckbox");
 
 let newSheetTrackId = '';
 let newSheetWorksId = '';
+let newSheetTrackUrl = '';
+let newSheetWorksUrl = '';
 
 createBtn.addEventListener("click", async () => {
 
@@ -35,6 +37,8 @@ createBtn.addEventListener("click", async () => {
                 ✅ Works Sheet created: <a href="${result.urlWorks}" target="_blank">Open it here</a>`;
             newSheetTrackId = result.urlTrack.match(/spreadsheets\/d\/([a-zA-Z0-9-_]+)/)[1];
             newSheetWorksId = result.urlWorks.match(/spreadsheets\/d\/([a-zA-Z0-9-_]+)/)[1];
+            newSheetTrackUrl = result.urlTrack;
+            newSheetWorksUrl = result.urlWorks;
         } else {
             statusP.innerText = '❌ Error creating sheet.';
         }
@@ -238,7 +242,10 @@ syncBtn.addEventListener("click", async () => {
 
 
         if (trackResult.success && worksResult.success && ipChainResult.success) {
-            let statusHtml = '✅ Sync successfully!';
+            let statusHtml = `
+                ✅ Sync successfully!<br>
+                📄 Track Sheet: <a href="${newSheetTrackUrl}" target="_blank">Open it here</a><br>
+                📄 Works Sheet: <a href="${newSheetWorksUrl}" target="_blank">Open it here</a>`;
             if (warningMessages.length > 0) {
                 statusHtml += '<br><br>' + warningMessages.join('<br><br>');
             }

@@ -36,8 +36,8 @@ const TEMPLATE_WR = {
         ['Fill in this or one of the following three cells to identify the work, depending on what information you have filled in on the main Works tab', '', '', '', 'Map the works to the contract by using the Contract Name', 'Contract Percentage, a number']
     ],
     'Specific Participation Rates': [
-        ['Work ID', 'Work Title', 'Work Main Identifier', 'Work Tunecode', 'Contract', 'Distribution Channel', 'Source', 'Territory', 'Rate'],
-        ['Fill in this or one of the following three cells to identify the work, depending on what information you have filled in on the main Works tab', '', '', '', 'Must match existing contract name in Curve exactly', 'Must match channel list set up in setting area', '', 'Must match territory ISO2 code or territory group name', 'A Number']
+        ['Work ID', 'Work Title', 'Work Main Identifier', 'Work Tunecode', 'Contract', 'Distribution Channel', 'Source', 'Territory', 'Publishers', 'Rate'],
+        ['Fill in this or one of the following three cells to identify the work, depending on what information you have filled in on the main Works tab', '', '', '', 'Must match existing contract name in Curve exactly', 'Must match channel list set up in setting area', '', 'Must match territory ISO2 code or territory group name', 'Use Colon delimiters for multiple Publishers', 'A Number']
     ],
     'Society Identifiers': [
         ['Work ID', 'Work Title', 'Work Main Identifier', 'Work Tunecode', 'Society', 'Identifier'],

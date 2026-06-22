@@ -22,7 +22,7 @@ export async function mergeToZvonko(inputSheetId, sheetIdZvonko) {
         const collect = [96, 106, 116, 126, 136];
         const digits = '1234567890';
         const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        const symbols = `!"#$%&'()*+,-./:;<=>?@[]^_\`{|}~`;
+        const symbols = `!"#$%&'()*+,-./:;<=>?@[]^_\`{|}~’—`;
         const expectedShares = {
             1: [100],
             2: [50, 50],

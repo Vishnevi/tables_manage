@@ -7,6 +7,8 @@ import createZvonko from "../zvonkoTools/createSheetZvonkoTools/createZvonkoRout
 import mergeToZvonko from "../zvonkoTools/mergeZvonkoTools/mergeToZvonkoRoutes.js";
 import createLB from "../limeBlueTools/createLimeBlueTools/createLimeBlueRoutes.js";
 import mergeLB from "../limeBlueTools/mergeToLimeBlueTools/mergeToLimeBlueRoutes.js"
+import createMain from "../reverseTools/createMainTools/createMainRoutes.js";
+import mergeToMain from "../reverseTools/mergeToMainTools/mergeToMainRoutes.js";
 import { verifyToken } from "../auth/authMiddleware.js";
 
 
@@ -20,4 +22,6 @@ export default function routes(app){
     app.use('/sync-zvonko', verifyToken, mergeToZvonko);
     app.use('/create-LB', verifyToken, createLB);
     app.use('/sync-LB', verifyToken, mergeLB);
+    app.use('/create-main', verifyToken, createMain);
+    app.use('/sync-main', verifyToken, mergeToMain);
 }

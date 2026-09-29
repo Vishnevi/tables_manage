@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Lime Blue</title>
+    <title>Reverse</title>
     <script>
         if (!localStorage.getItem('auth_token')) {
             window.location.href = '/login.html';
@@ -25,15 +25,17 @@
     </header>
 
     <div class="container">
-        <label for="sheetInputId"></label>
-        <input type="text" id="sheetInputId" placeholder="Sheet ID">
+        <label for="trackInputId"></label>
+        <input type="text" id="trackInputId" class="sheetInput" placeholder="Track Sheet ID">
+        <label for="worksInputId"></label>
+        <input type="text" id="worksInputId" class="sheetInput" placeholder="Works Sheet ID">
         <div class="buttons">
-            <button id="createLBBtn">Create Lime Blue</button>
-            <button id="syncLBBtn">Sync Lime Blue</button>
+            <button id="createMainBtn">Create</button>
+            <button id="syncMainBtn">Sync</button>
         </div>
-        <p id="statusLB"></p>
+        <p id="statusMain"></p>
     </div>
-    <script type="module" src="limeBlueScript.js"></script>
+    <script type="module" src="reverseScript.js"></script>
 </div>
 </body>
 </html>

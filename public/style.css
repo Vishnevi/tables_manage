@@ -21,7 +21,7 @@ hr {
     margin: 10px 0 45px 0;
 }
 
-#sheetInputId {
+#sheetInputId, .sheetInput {
     width: 500px;
     padding: 15px;
     margin: 15px;

@@ -256,6 +256,13 @@ const TEMPLATE_WR = {
     ]
 };
 
+const TEMPLATE_MAIN = {
+    'Sheet1': [
+        ['Song Details', '', '', '', 'Performing Artists', '', '', '', '', 'Recording Details', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '',  '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'Writer Details', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+        ['Song Title', 'Work Number', 'Alternative Song Title 1', 'Alternative Song Title 2', 'Performing Artist 1', 'Performing Artist 2', 'Performing Artist 3', 'Performing Artist 4', 'Performing Artist 5', 'Recording Title 1', 'ISRC 1', 'Record Label 1', 'Release Date 1', 'Recording Title 2', 'ISRC 2', 'Record Label 2', 'Release Date 2', 'Recording Title 3', 'ISRC 3', 'Record Label 3', 'Release Date 3', 'Recording Title 4', 'ISRC 4', 'Record Label 4', 'Release Date 4', 'Recording Title 5', 'ISRC 5', 'Record Label 5', 'Release Date 5', 'Recording Title 6', 'ISRC 6', 'Record Label 6', 'Release Date 6', 'Recording Title 7', 'ISRC 7', 'Record Label 7', 'Release Date 7', 'Recording Title 8', 'ISRC 8', 'Record Label 8', 'Release Date 8', 'Recording Title 9', 'ISRC 9', 'Record Label 9', 'Release Date 9', 'Recording Title 10', 'ISRC 10', 'Record Label 10', 'Release Date 10', 'Recording Title 11', 'ISRC 11', 'Record Label 11', 'Release Date 11', 'Recording Title 12', 'ISRC 12', 'Record Label 12', 'Release Date 12', 'Recording Title 13', 'ISRC 13', 'Record Label 13', 'Release Date 13', 'Recording Title 14', 'ISRC 14', 'Record Label 14', 'Release Date 14', 'Recording Title 15', 'ISRC 15', 'Record Label 15', 'Release Date 15', 'Recording Title 16', 'ISRC 16', 'Record Label 16', 'Release Date 16', 'Recording Title 17', 'ISRC 17', 'Record Label 17', 'Release Date 17', 'Recording Title 18', 'ISRC 18', 'Record Label 18', 'Release Date 18', 'Recording Title 19', 'ISRC 19', 'Record Label 19', 'Release Date 19', 'Recording Title 20', 'ISRC 20', 'Record Label 20', 'Release Date 20', 'Writer First Name 1', 'Writer Middle Name(S) 1', 'Writer Last Name 1', 'Writer Share 1', 'Writer Capacity 1', 'Writer Membership Name 1', 'Writer CAE/IPI 1', 'Right To Collect? 1', 'Publisher Name 1', 'Publisher CAE/IPI 1', 'Writer First Name 2', 'Writer Middle Name(S) 2', 'Writer Last Name 2', 'Writer Share 2', 'Writer Capacity 2', 'Writer Membership Name 2', 'Writer CAE/IPI 2', 'Right To Collect? 2', 'Publisher Name 2', 'Publisher CAE/IPI 2', 'Writer First Name 3', 'Writer Middle Name(S) 3', 'Writer Last Name 3', 'Writer Share 3', 'Writer Capacity 3', 'Writer Membership Name 3', 'Writer CAE/IPI 3', 'Right To Collect? 3', 'Publisher Name 3', 'Publisher CAE/IPI 3', 'Writer First Name 4', 'Writer Middle Name(S) 4', 'Writer Last Name 4', 'Writer Share 4', 'Writer Capacity 4', 'Writer Membership Name 4', 'Writer CAE/IPI 4', 'Right To Collect? 4', 'Publisher Name 4', 'Publisher CAE/IPI 4', 'Writer First Name 5', 'Writer Middle Name(S) 5', 'Writer Last Name 5', 'Writer Share 5', 'Writer Capacity 5', 'Writer Membership Name 5', 'Writer CAE/IPI 5', 'Right To Collect? 5', 'Publisher Name 5', 'Publisher CAE/IPI 5', 'Writer First Name 6', 'Writer Middle Name(S) 6', 'Writer Last Name 6', 'Writer Share 6', 'Writer Capacity 6', 'Writer Membership Name 6', 'Writer CAE/IPI 6', 'Right To Collect? 6', 'Publisher Name 6', 'Publisher CAE/IPI 6', 'Writer First Name 7', 'Writer Middle Name(S) 7', 'Writer Last Name 7', 'Writer Share 7', 'Writer Capacity 7', 'Writer Membership Name 7', 'Writer CAE/IPI 7', 'Right To Collect? 7', 'Publisher Name 7', 'Publisher CAE/IPI 7', 'Writer First Name 8', 'Writer Middle Name(S) 8', 'Writer Last Name 8', 'Writer Share 8', 'Writer Capacity 8', 'Writer Membership Name 8', 'Writer CAE/IPI 8', 'Right To Collect? 8', 'Publisher Name 8', 'Publisher CAE/IPI 8', 'Writer First Name 9', 'Writer Middle Name(S) 9', 'Writer Last Name 9', 'Writer Share 9', 'Writer Capacity 9', 'Writer Membership Name 9', 'Writer CAE/IPI 9', 'Right To Collect? 9', 'Publisher Name 9', 'Publisher CAE/IPI 9', 'Writer First Name 10', 'Writer Middle Name(S) 10', 'Writer Last Name 10', 'Writer Share 10', 'Writer Capacity 10', 'Writer Membership Name 10', 'Writer CAE/IPI 10', 'Right To Collect? 10', 'Publisher Name 10', 'Publisher CAE/IPI 10']
+    ]
+}
+
 export async function createTrackSheet() {
     const authClient = await getUserAuth(); // мой gmail
     const drive = google.drive({version: 'v3', auth: authClient});
@@ -499,6 +506,100 @@ export async function createWorksSheet() {
         requestBody: { type: 'anyone', role: 'writer' }
     });
 
+
+    return `https://docs.google.com/spreadsheets/d/${spreadsheetId}`;
+}
+
+
+
+export async function createMainSheet() {
+    const authClient = await getUserAuth();
+    const drive = google.drive({version: 'v3', auth: authClient});
+    const sheets = google.sheets({version: 'v4', auth: authClient});
+
+    const createResp = await drive.files.create({
+        requestBody: {
+            name: 'MAIN TEST',
+            mimeType: 'application/vnd.google-apps.spreadsheet'
+        },
+        fields: 'id'
+    });
+
+    const spreadsheetId = createResp.data.id;
+    const templateData = TEMPLATE_MAIN['Sheet1'];
+    const columnCount = templateData[0].length;
+    const rowCount = templateData.length;
+
+    await sheets.spreadsheets.batchUpdate({
+        spreadsheetId,
+        requestBody: {
+            requests: [
+                {
+                    updateSheetProperties: {
+                        properties: { sheetId: 0, title: 'Sheet1' },
+                        fields: 'title'
+                    }
+                },
+                {
+                    updateDimensionProperties: {
+                        range: {
+                            sheetId: 0,
+                            dimension: 'ROWS',
+                            startIndex: 0,
+                            endIndex: rowCount
+                        },
+                        properties: { pixelSize: 50 },
+                        fields: 'pixelSize'
+                    }
+                },
+                {
+                    updateDimensionProperties: {
+                        range: {
+                            sheetId: 0,
+                            dimension: 'COLUMNS',
+                            startIndex: 0,
+                            endIndex: columnCount
+                        },
+                        properties: { pixelSize: 200 },
+                        fields: 'pixelSize'
+                    }
+                },
+                {
+                    repeatCell: {
+                        range: {
+                            sheetId: 0,
+                            startRowIndex: 0,
+                            endRowIndex: rowCount,
+                            startColumnIndex: 0,
+                            endColumnIndex: columnCount
+                        },
+                        cell: {
+                            userEnteredFormat: {
+                                horizontalAlignment: 'CENTER',
+                                verticalAlignment: 'MIDDLE',
+                                wrapStrategy: 'WRAP'
+                            }
+                        },
+                        fields: 'userEnteredFormat(horizontalAlignment,verticalAlignment,wrapStrategy)'
+                    }
+                }
+            ]
+        }
+    });
+
+    await sheets.spreadsheets.values.update({
+        spreadsheetId,
+        range: 'Sheet1!A1',
+        valueInputOption: 'RAW',
+        requestBody: {
+            values: templateData
+        }
+    });
+
+    await drive.permissions.create({
+        fileId: spreadsheetId,
+        requestBody: { type: 'anyone', role: 'writer' }
+    });
 
     return `https://docs.google.com/spreadsheets/d/${spreadsheetId}`;
 }

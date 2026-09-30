@@ -290,7 +290,7 @@ export async function mergeToIPChain(inputSheetId, sheetIdWorks, isLabel = false
                         middleName: row[author.middleName] ? row[author.middleName].trim() : '',
                         lastName,
                         collect,
-                        share: row[author.share] ? parseFloat(row[author.share]) : 0,
+                        share: row[author.share] ? parseFloat(String(row[author.share]).replace(',', '.')) : 0,
                         capacity: row[author.capacity] ? row[author.capacity].trim().toUpperCase() : '',
                         ipi: row[author.ipi] ? row[author.ipi].trim() : ''
                     });

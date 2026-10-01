@@ -8,6 +8,14 @@ function getCapacity(roleText) {
     return '';
 }
 
+function parseShare(value) {
+    return value ? parseFloat(value.trim().replace(',', '.')) || 0 : 0;
+}
+
+function roundShare(value) {
+    return Math.round(value * 100) / 100;
+}
+
 export async function mergeToMain(sheetIdTrack, sheetIdWorks, sheetIdMain) {
     const authClient = await auth.getClient();
     const sheets = google.sheets({version: 'v4', auth: authClient});
@@ -40,6 +48,7 @@ export async function mergeToMain(sheetIdTrack, sheetIdWorks, sheetIdMain) {
 
         const ISRCMap = {};
         const participantsMap = {};
+        const totalShareYMap = {};
         const mainOutput = [];
 
         trackRows.forEach((row) => {
@@ -52,32 +61,47 @@ export async function mergeToMain(sheetIdTrack, sheetIdWorks, sheetIdMain) {
         });
 
         ipChainRows.forEach((row) => {
+            const workId = row[0] ? row[0].trim() : '';
             const workTitle = row[1] ? row[1].trim() : '';
 
             if (!workTitle) {
                 return;
             }
 
-            const titleKey = workTitle.toLowerCase();
+            const titleKey = workId || workTitle.toLowerCase();
             if (!participantsMap[titleKey]) {
                 participantsMap[titleKey] = [];
             }
 
             participantColumns.forEach((i) => {
                 const type = row[i] ? row[i].trim() : '';
+                const name = row[i + 1] ? row[i + 1].trim() : '';
+
+                if (type === 'Publisher' && name === 'Topgunmusic Corp') {
+                    totalShareYMap[titleKey] = parseShare(row[i + 8]);
+                    return;
+                }
 
                 if (type !== 'Composer') {
                     return;
                 }
 
+                const performanceOwned = parseShare(row[i + 9]);
+                const existing = participantsMap[titleKey].find(p => p.name === name);
+
+                if (existing) {
+                    existing.performanceOwned += performanceOwned;
+                    return;
+                }
+
                 participantsMap[titleKey].push({
-                    name: row[i + 1] ? row[i + 1].trim() : '',
+                    name: name,
                     firstName: row[i + 2] ? row[i + 2].trim() : '',
                     middleName: row[i + 3] ? row[i + 3].trim() : '',
                     lastName: row[i + 4] ? row[i + 4].trim() : '',
                     ipi: row[i + 5] ? row[i + 5].trim() : '',
                     controlled: row[i + 6] ? row[i + 6].trim().toUpperCase() : '',
-                    share: row[i + 7] ? parseFloat(row[i + 7]) : 0,
+                    performanceOwned: performanceOwned,
                     capacity: row[i + 11] ? row[i + 11].trim() : ''
                 });
             });
@@ -101,7 +125,9 @@ export async function mergeToMain(sheetIdTrack, sheetIdWorks, sheetIdMain) {
             });
 
             const composers = row[2] ? row[2].split(',').map(el => el.trim()).filter(el => el) : [];
-            const participants = participantsMap[songTitle.toLowerCase()] || [];
+            const workId = row[0] ? row[0].trim() : '';
+            const titleKey = workId || songTitle.toLowerCase();
+            const participants = participantsMap[titleKey] || [];
 
             const writers = composers.slice(0, writerColumns.length).map((fullName) => {
                 const participant = participants.find(p => p.name === fullName);
@@ -118,14 +144,31 @@ export async function mergeToMain(sheetIdTrack, sheetIdWorks, sheetIdMain) {
                     lastName: parts.length > 1 ? parts[parts.length - 1] : '',
                     ipi: '',
                     controlled: '',
-                    share: 0,
+                    performanceOwned: 0,
                     capacity: ''
                 };
             });
 
             const writersWithY = writers.filter(writer => writer.controlled === 'TRUE');
             const writersWithN = writers.filter(writer => writer.controlled === 'FALSE');
-            const totalShareN = writersWithN.reduce((sum, writer) => sum + writer.share, 0);
+            const totalShareY = totalShareYMap[titleKey] || 0;
+            const totalShareN = 100 - totalShareY;
+            const totalPerformanceN = writersWithN.reduce((sum, writer) => sum + writer.performanceOwned, 0);
+            const shares = new Map();
+
+            let restShareY = totalShareY;
+            writersWithY.forEach((writer, i) => {
+                const share = i === writersWithY.length - 1 ? roundShare(restShareY) : roundShare(writer.performanceOwned * 2);
+                shares.set(writer, share);
+                restShareY -= share;
+            });
+
+            let restShareN = totalShareN;
+            writersWithN.forEach((writer, i) => {
+                const share = i === writersWithN.length - 1 ? roundShare(restShareN) : roundShare(totalPerformanceN ? totalShareN * writer.performanceOwned / totalPerformanceN : 0);
+                shares.set(writer, share);
+                restShareN -= share;
+            });
 
             writers.forEach((writer, i) => {
                 const col = writerColumns[i];
@@ -137,14 +180,14 @@ export async function mergeToMain(sheetIdTrack, sheetIdWorks, sheetIdMain) {
                 mainRow[col + 6] = writer.ipi;
 
                 if (writer.controlled === 'TRUE') {
-                    mainRow[col + 3] = writersWithY.length === 1 ? `${100 - totalShareN}%` : '';
+                    mainRow[col + 3] = `${shares.get(writer)}%`;
                     mainRow[col + 7] = 'Y';
                     mainRow[col + 8] = 'Topgunmusic Corp';
                     mainRow[col + 9] = '1092871243';
                 }
 
                 if (writer.controlled === 'FALSE') {
-                    mainRow[col + 3] = `${writer.share}%`;
+                    mainRow[col + 3] = `${shares.get(writer)}%`;
                     mainRow[col + 7] = 'N';
                 }
             });

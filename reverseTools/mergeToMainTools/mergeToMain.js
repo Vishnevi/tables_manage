@@ -78,7 +78,7 @@ export async function mergeToMain(sheetIdTrack, sheetIdWorks, sheetIdMain) {
                 const name = row[i + 1] ? row[i + 1].trim() : '';
 
                 if (type === 'Publisher' && name === 'Topgunmusic Corp') {
-                    totalShareYMap[titleKey] = parseShare(row[i + 8]);
+                    totalShareYMap[titleKey] = (totalShareYMap[titleKey] || 0) + parseShare(row[i + 8]);
                     return;
                 }
 
@@ -151,7 +151,9 @@ export async function mergeToMain(sheetIdTrack, sheetIdWorks, sheetIdMain) {
 
             const writersWithY = writers.filter(writer => writer.controlled === 'TRUE');
             const writersWithN = writers.filter(writer => writer.controlled === 'FALSE');
-            const totalShareY = totalShareYMap[titleKey] || 0;
+            const totalSharePublisherY = roundShare(totalShareYMap[titleKey] || 0);
+            const totalPerformanceY = roundShare(writersWithY.reduce((sum, writer) => sum + writer.performanceOwned * 2, 0));
+            const totalShareY = Math.abs(totalSharePublisherY - totalPerformanceY) <= 1 ? totalSharePublisherY : totalPerformanceY;
             const totalShareN = 100 - totalShareY;
             const totalPerformanceN = writersWithN.reduce((sum, writer) => sum + writer.performanceOwned, 0);
             const shares = new Map();

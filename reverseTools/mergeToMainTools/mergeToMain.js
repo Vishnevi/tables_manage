@@ -16,6 +16,11 @@ function roundShare(value) {
     return Math.round(value * 100) / 100;
 }
 
+function getLastName(fullName) {
+    const parts = fullName.split(' ').filter(el => el);
+    return parts.length > 1 ? parts[parts.length - 1].toLowerCase() : '';
+}
+
 export async function mergeToMain(sheetIdTrack, sheetIdWorks, sheetIdMain) {
     const authClient = await auth.getClient();
     const sheets = google.sheets({version: 'v4', auth: authClient});
@@ -118,7 +123,7 @@ export async function mergeToMain(sheetIdTrack, sheetIdWorks, sheetIdMain) {
                 mainRow[performerColumns[i]] = performer;
             });
 
-            const ISRCs = row[21] ? row[21].split(';').map(el => el.trim()).filter(el => el) : [];
+            const ISRCs = row[21] ? row[21].split(';').map(el => el.trim()).filter((el, i, arr) => el && arr.findIndex(ISRC => ISRC.toUpperCase() === el.toUpperCase()) === i) : [];
             ISRCs.slice(0, titleColumns.length).forEach((ISRC, i) => {
                 mainRow[titleColumns[i]] = ISRCMap[ISRC.toUpperCase()] || '';
                 mainRow[titleColumns[i] + 1] = ISRC;
@@ -129,11 +134,19 @@ export async function mergeToMain(sheetIdTrack, sheetIdWorks, sheetIdMain) {
             const titleKey = workId || songTitle.toLowerCase();
             const participants = participantsMap[titleKey] || [];
 
-            const writers = composers.slice(0, writerColumns.length).map((fullName) => {
-                const participant = participants.find(p => p.name === fullName);
+            const exactParticipants = composers.map(fullName => participants.find(p => p.name === fullName));
 
-                if (participant) {
-                    return participant;
+            const writers = composers.slice(0, writerColumns.length).map((fullName, i) => {
+                if (exactParticipants[i]) {
+                    return exactParticipants[i];
+                }
+
+                const lastName = getLastName(fullName);
+                const sameLastNameComposers = composers.filter((name, j) => !exactParticipants[j] && getLastName(name) === lastName);
+                const candidates = participants.filter(p => !exactParticipants.includes(p) && p.lastName.toLowerCase() === lastName);
+
+                if (lastName && sameLastNameComposers.length === 1 && candidates.length === 1) {
+                    return candidates[0];
                 }
 
                 const parts = fullName.split(' ').filter(el => el);

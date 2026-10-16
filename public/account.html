@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Account</title>
+    <script>
+        if (!localStorage.getItem('auth_token')) {
+            window.location.href = '/login.html';
+        }
+    </script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="page">
+    <header>
+        <div class="headerContainer">
+            <nav>
+                <ul class="menu">
+                    <li><a href="index.html">Songs</a></li>
+                    <li><a href="limeBlue.html">Lime Blue</a></li>
+                    <li><a href="reverse.html">Reverse</a></li>
+                    <li><a href="account.html">Account</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container accountContainer">
+        <form id="accountForm" autocomplete="off">
+            <input type="text" id="firstName" class="sheetInput" placeholder="First Name">
+            <input type="text" id="lastName" class="sheetInput" placeholder="Last Name">
+            <input type="text" id="email" class="sheetInput" placeholder="Email">
+            <input type="text" id="lang" class="sheetInput" placeholder="Lang">
+            <input type="text" id="login" class="sheetInput" placeholder="Login">
+            <input type="text" id="earningsName" class="sheetInput" placeholder="Earnings Name">
+            <input type="text" id="address" class="sheetInput" placeholder="Address">
+            <input type="text" id="city" class="sheetInput" placeholder="City">
+            <input type="text" id="postalCode" class="sheetInput" placeholder="Postal Code">
+            <input type="text" id="country" class="sheetInput" placeholder="Country">
+            <div class="buttons">
+                <button type="submit" id="generateAccountBtn">Generate</button>
+            </div>
+        </form>
+        <p id="statusAccount"></p>
+
+        <div id="accountResult" hidden>
+            <div class="resultBlock">
+                <button type="button" class="copyBtn" data-target="applicationOutput">Copy</button>
+                <pre id="applicationOutput"></pre>
+            </div>
+            <div class="resultBlock">
+                <button type="button" class="copyBtn" data-target="accountOutput">Copy</button>
+                <pre id="accountOutput"></pre>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="accountScript.js"></script>
+</div>
+</body>
+</html>

@@ -83,3 +83,40 @@ header {
 .menu a:hover {
     color: #6c5ce7;
 }
+.accountContainer {
+    margin-top: 30px;
+    padding-bottom: 40px;
+}
+
+#accountForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#accountForm .sheetInput {
+    margin: 6px;
+    padding: 10px;
+}
+
+.resultBlock {
+    position: relative;
+    margin-top: 15px;
+}
+
+.resultBlock pre {
+    width: 500px;
+    padding: 15px;
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.copyBtn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 70px;
+    height: 28px;
+}
